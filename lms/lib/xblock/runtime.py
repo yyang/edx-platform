@@ -7,6 +7,7 @@ import re
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from user_api import user_service
+from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -179,6 +180,20 @@ class UserTagsService(object):
 
         return user_service.set_course_tag(self._get_current_user(),
                                            self.runtime.course_id, key, value)
+
+
+class LmsUserService(object):
+    """
+    Implement the XBlock runtime "User" service
+
+    Args:
+        student_id (str) The student id to find an anonymous student id for.
+
+    Returns:
+        The anonymous student id, based off the given student_id.
+    """
+    def get_anonymous_student_id(self, student_id, course_id):
+        return anonymous_id_for_user(student_id, course_id)
 
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method
