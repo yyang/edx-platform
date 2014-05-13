@@ -114,6 +114,23 @@ def anonymous_id_for_user(user, course_id):
     return digest
 
 
+def anonymous_id_for_user_name(user_name, course_id):
+    """
+    Given a user name, return the anonymous user id for the student found.
+    Return None if no user is found with the given user name.
+
+    Args:
+        user_name (str): The user name to find an associated anonymous user id.
+        course_id (str): The course id associated with the anonymous user id.
+
+    Returns:
+        The anonymous user id for the user name and course.
+
+    """
+    user = User.objects.get(username=user_name)
+    return anonymous_id_for_user(user, course_id)
+
+
 def user_by_anonymous_id(id):
     """
     Return user by anonymous_user_id using AnonymousUserId lookup table.

@@ -4,10 +4,11 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 
 import re
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from user_api import user_service
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user_name
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -188,12 +189,13 @@ class LmsUserService(object):
 
     Args:
         student_id (str) The student id to find an anonymous student id for.
+        course_id (str) the course associated with this student id.
 
     Returns:
         The anonymous student id, based off the given student_id.
     """
     def get_anonymous_student_id(self, student_id, course_id):
-        return anonymous_id_for_user(student_id, course_id)
+        return anonymous_id_for_user_name(student_id, course_id)
 
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method

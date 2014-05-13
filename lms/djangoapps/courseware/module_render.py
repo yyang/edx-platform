@@ -484,7 +484,6 @@ def get_module_system_for_user(user, field_data_cache,
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
-        get_anonymous_user=anonymous_id_for_user,
         services={
             'i18n': ModuleI18nService(),
             'user': LmsUserService(),
