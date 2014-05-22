@@ -356,17 +356,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Tests the ajax callback to render an XModule
         """
-<<<<<<< HEAD
-=======
-        resp = self._test_preview(Location('i4x', 'edX', 'toy', 'vertical', 'vertical_test', None), 'container_preview')
-        self.assertContains(resp, '/branch/draft/block/sample_video')
-        self.assertContains(resp, '/branch/draft/block/separate_file_video')
-        self.assertContains(resp, '/branch/draft/block/video_with_end_time')
-        self.assertContains(resp, '/branch/draft/block/T1_changemind_poll_foo_2')
-
-    def _test_preview(self, location, view_name):
-        """ Preview test case. """
->>>>>>> edx/master
         direct_store = modulestore('direct')
         _, course_items = import_from_xml(direct_store, 'common/test/data/', ['toy'])
         usage_key = course_items[0].id.make_usage_key('vertical', 'vertical_test')
@@ -379,11 +368,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # TODO: uncomment when preview no longer has locations being returned.
         # _test_no_locations(self, resp)
 
-        # These are the data-ids of the xblocks contained in the vertical.
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+sample_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+separate_file_video')
-        self.assertContains(resp, 'edX+toy+2012_Fall+video+video_with_end_time')
-        self.assertContains(resp, 'edX+toy+2012_Fall+poll_question+T1_changemind_poll_foo_2')
+        self.assertContains(resp, '/branch/draft/block/sample_video')
+        self.assertContains(resp, '/branch/draft/block/separate_file_video')
+        self.assertContains(resp, '/branch/draft/block/video_with_end_time')
+        self.assertContains(resp, '/branch/draft/block/T1_changemind_poll_foo_2')
 
     def test_delete(self):
         direct_store = modulestore('direct')
