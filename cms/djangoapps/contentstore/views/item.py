@@ -179,7 +179,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = get_modulestore(usage_key)
         xblock = store.get_item(usage_key)
-        is_read_only = _xblock_is_read_only(component)
+        is_read_only = _is_xblock_read_only(xblock)
         container_views = ['container_preview', 'reorderable_container_child_preview']
         unit_views = ['student_view']
 
