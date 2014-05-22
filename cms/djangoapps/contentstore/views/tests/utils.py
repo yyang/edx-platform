@@ -25,7 +25,7 @@ class StudioPageTestCase(CourseTestCase):
         """
         Returns the HTML for the page representing the xblock.
         """
-        url = xblock_studio_url(xblock, self.course)
+        url = xblock_studio_url(xblock)
         self.assertIsNotNone(url)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, 200)
