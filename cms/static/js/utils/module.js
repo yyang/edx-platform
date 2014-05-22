@@ -8,14 +8,14 @@
  *               the location if passed in.
  */
 define(["underscore"], function (_) {
-    var urlRoot = '/xblock';
+    var urlRoot = '/xblock/';
 
     var getUpdateUrl = function (locator) {
         if (_.isUndefined(locator)) {
-            return urlRoot + "/";
+            return urlRoot;
         }
         else {
-            return urlRoot + "/" + locator;
+            return urlRoot + locator;
         }
     };
     return {
