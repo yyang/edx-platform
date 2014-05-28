@@ -39,6 +39,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from xmodule.modulestore.mongo.draft import DRAFT
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler']
 
@@ -121,10 +122,8 @@ def xblock_handler(request, usage_key_string):
                 return HttpResponse(status=406)
 
         elif request.method == 'DELETE':
-            delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
-            delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
-
-            return _delete_item_at_location(usage_key, delete_children, delete_all_versions, request.user)
+            modulestore().delete_item(usage_key, request.user, revision=DRAFT)
+            return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
             return _save_item(
                 request,
@@ -292,19 +291,11 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
 
     if publish:
         if publish == 'make_private':
-            _xmodule_recurse(
-                existing_item,
-                lambda i: modulestore().unpublish(i.location),
-                ignore_exception=ItemNotFoundError
-            )
+            modulestore().unpublish(existing_item.location),
         elif publish == 'create_draft':
             # This recursively clones the existing item location to a draft location (the draft is
             # implicit, because modulestore is a Draft modulestore)
-            _xmodule_recurse(
-                existing_item,
-                lambda i: modulestore().convert_to_draft(i.location),
-                ignore_exception=DuplicateItemError
-            )
+            modulestore().convert_to_draft(existing_item.location)
 
     if data:
         # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
@@ -363,18 +354,7 @@ def _save_item(request, usage_key, data=None, children=None, metadata=None, null
     # Make public after updating the xblock, in case the caller asked
     # for both an update and a publish.
     if publish and publish == 'make_public':
-        def _publish(block):
-            # This is super gross, but prevents us from publishing something that
-            # we shouldn't. Ideally, all modulestores would have a consistant
-            # interface for publishing. However, as of now, only the DraftMongoModulestore
-            # does, so we have to check for the attribute explicitly.
-            store = get_modulestore(block.location)
-            store.publish(block.location, request.user.id)
-
-        _xmodule_recurse(
-            existing_item,
-            _publish
-        )
+        modulestore().publish(existing_item.location, request.user.id)
 
     # Note that children aren't being returned until we have a use case.
     return JsonResponse(result)
@@ -476,33 +456,6 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
     return dest_usage_key
 
 
-def _delete_item_at_location(item_usage_key, delete_children=False, delete_all_versions=False, user=None):
-    """
-    Deletes the item at with the given Location.
-
-    It is assumed that course permissions have already been checked.
-    """
-    store = get_modulestore(item_usage_key)
-
-    item = store.get_item(item_usage_key)
-
-    if delete_children:
-        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions=delete_all_versions))
-    else:
-        store.delete_item(item.location, delete_all_versions=delete_all_versions)
-
-    # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
-    if delete_all_versions:
-        parent_locs = modulestore('direct').get_parent_locations(item_usage_key)
-
-        for parent_loc in parent_locs:
-            parent = modulestore('direct').get_item(parent_loc)
-            parent.children.remove(item_usage_key)
-            modulestore('direct').update_item(parent, user.id if user else None)
-
-    return JsonResponse()
-
-
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
@@ -526,7 +479,7 @@ def orphan_handler(request, course_key_string):
             for itemloc in items:
                 # get_orphans returns the deprecated string format
                 usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
-                modulestore().delete_item(usage_key, delete_all_versions=True)
+                modulestore().delete_item(usage_key, request.user)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

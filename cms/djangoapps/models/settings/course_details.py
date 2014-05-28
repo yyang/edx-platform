@@ -86,7 +86,7 @@ class CourseDetails(object):
         temploc = course_key.make_usage_key('about', about_key)
         store = get_modulestore(temploc)
         if data is None:
-            store.delete_item(temploc)
+            store.delete_item(temploc, user)
         else:
             try:
                 about_item = store.get_item(temploc)
