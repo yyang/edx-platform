@@ -250,6 +250,28 @@ class LoncapaResponse(object):
         # log.debug('new_cmap = %s' % new_cmap)
         return new_cmap
 
+
+
+
+    def _get_hinting(self, student_answers, new_cmap, old_cmap):
+        '''
+        Assuming no hint function has been declared, look to the XML for
+        any hinting which might be need to be displayed to the student.
+        '''
+        print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
+        for problem in student_answers:
+            print 'problem: ' + problem
+            for choice in student_answers[problem]:
+                print '    choice: ' + choice
+
+
+
+
+
+
+
+
+
     def get_hints(self, student_answers, new_cmap, old_cmap):
         """
         Generate adaptive hints for this problem based on student answers, the old CorrectMap,
@@ -261,6 +283,7 @@ class LoncapaResponse(object):
         """
         hintgroup = self.xml.find('hintgroup')
         if hintgroup is None:
+            self._get_hinting(student_answers, new_cmap, old_cmap)
             return
 
         # hint specified by function?
