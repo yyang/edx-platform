@@ -252,17 +252,17 @@ class LoncapaResponse(object):
 
 
 
-
-    def _get_hinting(self, student_answers, new_cmap, old_cmap):
+    @abc.abstractmethod
+    def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
         '''
         Assuming no hint function has been declared, look to the XML for
         any hinting which might be need to be displayed to the student.
         '''
-        print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
-        for problem in student_answers:
-            print 'problem: ' + problem
-            for choice in student_answers[problem]:
-                print '    choice: ' + choice
+        # print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
+        # for problem in student_answers:
+        #     print 'problem: ' + problem
+        #     for choice in student_answers[problem]:
+        #         print '    choice: ' + choice
 
 
 
@@ -283,7 +283,7 @@ class LoncapaResponse(object):
         """
         hintgroup = self.xml.find('hintgroup')
         if hintgroup is None:
-            self._get_hinting(student_answers, new_cmap, old_cmap)
+            self._get_xml_hints(student_answers, new_cmap, old_cmap)
             return
 
         # hint specified by function?
@@ -796,6 +796,17 @@ class MultipleChoiceResponse(LoncapaResponse):
             for choice in cxml
             if contextualize_text(choice.get('correct'), self.context) == "true"
         ]
+
+    def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
+        '''
+        Assuming no hint function has been declared, look to the XML for
+        any hinting which might be need to be displayed to the student.
+        '''
+        print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
+        for problem in student_answers:
+            print 'problem: ' + problem
+            for choice in student_answers[problem]:
+                print '    choice: ' + choice
 
     def mc_setup_response(self):
         """
