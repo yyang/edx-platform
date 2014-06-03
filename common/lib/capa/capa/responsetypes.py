@@ -252,17 +252,64 @@ class LoncapaResponse(object):
 
 
 
-    @abc.abstractmethod
+
+
+
+
+
+
+
+
+
+
+
+
+    #@abc.abstractmethod
     def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
         '''
         Assuming no hint function has been declared, look to the XML for
         any hinting which might be need to be displayed to the student.
+
+        Returns true if we're using new style hints
         '''
-        # print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
-        # for problem in student_answers:
-        #     print 'problem: ' + problem
-        #     for choice in student_answers[problem]:
-        #         print '    choice: ' + choice
+        using_new_style_hints = False           # assume we are not using new style hints
+
+        xproblem_element = self.xml.getroottree().xpath('.')
+        schema_version = xproblem_element[0].get('schema')
+        if schema_version and schema_version == '1.0':                # this is the right schema
+            using_new_style_hints = True
+            compound_hint_matched = False
+
+            compound_hints_list = self.xml.xpath('hints/hint')
+            for compound_hint_element in compound_hints_list:
+                for response_element in compound_hint_element.xpath('response'):
+                    print response_element.text.strip()
+
+            if not compound_hint_matched:                   # none of the compound conditions were met
+                for problem in student_answers:
+                    for student_answer in student_answers[problem]:
+                        hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
+                        hint = hint_list[0]
+
+                        if hint.get('label'):
+                            correctness_string = hint.get('label') + ': '
+                        else:
+                            choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                            choice = choice_list[0]
+
+                            correctness_string = 'INCORRECT: '      # assume the answer is incorrect
+
+                            if choice.get('correct') == 'true':
+                                correctness_string = 'CORRECT: '
+
+                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+
+        return using_new_style_hints
+
+
+
+
+
 
 
 
@@ -283,8 +330,8 @@ class LoncapaResponse(object):
         """
         hintgroup = self.xml.find('hintgroup')
         if hintgroup is None:
-            self._get_xml_hints(student_answers, new_cmap, old_cmap)
-            return
+            if self._get_xml_hints(student_answers, new_cmap, old_cmap):    # if any new style hints were found
+                return                                                      # exit to stop looking for hints
 
         # hint specified by function?
         hintfn = hintgroup.get('hintfn')
@@ -797,16 +844,16 @@ class MultipleChoiceResponse(LoncapaResponse):
             if contextualize_text(choice.get('correct'), self.context) == "true"
         ]
 
-    def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
-        '''
-        Assuming no hint function has been declared, look to the XML for
-        any hinting which might be need to be displayed to the student.
-        '''
-        print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
-        for problem in student_answers:
-            print 'problem: ' + problem
-            for choice in student_answers[problem]:
-                print '    choice: ' + choice
+    # def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
+    #     '''
+    #     Assuming no hint function has been declared, look to the XML for
+    #     any hinting which might be need to be displayed to the student.
+    #     '''
+    #     print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
+    #     for problem in student_answers:
+    #         print 'problem: ' + problem
+    #         for choice in student_answers[problem]:
+    #             print '    choice: ' + choice
 
     def mc_setup_response(self):
         """
