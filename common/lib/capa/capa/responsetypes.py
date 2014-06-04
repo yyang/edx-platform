@@ -280,10 +280,42 @@ class LoncapaResponse(object):
             using_new_style_hints = True
             compound_hint_matched = False
 
+            selection_id_list = []
+            for problem in student_answers:
+                for student_answer in student_answers[problem]:
+                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                    choice = choice_list[0]
+                    selection_id_list.append(choice.get('id'))
+
             compound_hints_list = self.xml.xpath('hints/hint')
             for compound_hint_element in compound_hints_list:
-                for response_element in compound_hint_element.xpath('response'):
-                    print response_element.text.strip()
+                compound_hint_conditions_met = True         # assume all conditions will be met
+
+                condition_id_list = []
+                for condition_element in compound_hint_element.xpath('response'):
+                    condition_id = condition_element.text.strip()
+                    print condition_id
+                    condition_id_list.append(condition_id)
+
+
+                if len(condition_id_list) != len(selection_id_list):
+                    print 'list counts differ'
+                    compound_hint_conditions_met = False
+                else:
+                    if condition_id_list.__contains__(choice.get('id')):
+                        print 'matched: ' + choice.get('id')
+                    else:
+                        print 'not matched: ' + choice.get('id')
+                        compound_hint_conditions_met = False
+
+
+
+                if compound_hint_conditions_met:
+                    compound_hint_matched = True
+                    new_cmap[problem]['msg'] = compound_hint_element.text.strip()
+
+
+
 
             if not compound_hint_matched:                   # none of the compound conditions were met
                 for problem in student_answers:
@@ -302,7 +334,7 @@ class LoncapaResponse(object):
                             if choice.get('correct') == 'true':
                                 correctness_string = 'CORRECT: '
 
-                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
 
         return using_new_style_hints
 
