@@ -278,12 +278,11 @@ class LoncapaResponse(object):
             using_new_style_hints = True                            # turns out we are using new style hints
         return using_new_style_hints
 
-
     def _get_compound_condition_hints(self, new_cmap, student_answers):
         compound_hint_matched = False       # assume we won't find any matching rules
 
-        selection_id_list = []              # create a list of all the student's selected id's
         for problem in student_answers:
+            selection_id_list = []              # create a list of all the student's selected id's
             for student_answer in student_answers[problem]:
                 choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
                 choice = choice_list[0]
