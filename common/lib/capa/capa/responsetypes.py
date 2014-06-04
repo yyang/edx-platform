@@ -264,58 +264,58 @@ class LoncapaResponse(object):
 
 
 
-    #@abc.abstractmethod
-    def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
+
+    def _using_new_style_hints(self):
+        '''
+        Examine the problem's XML tree to determine whether the "new style" hint mechanism is in use.
+
+        Return True if it is in use.
+        '''
+        using_new_style_hints = False  # assume we are not using new style hints
+        xproblem_element = self.xml.getroottree().xpath('.')
+        schema_version = xproblem_element[0].get('schema')
+        if schema_version and schema_version == '1.0':                # this is the right schema
+            using_new_style_hints = True                            # turns out we are using new style hints
+        return using_new_style_hints
+
+
+    def _get_xml_hints(self, student_answers, new_cmap):
         '''
         Assuming no hint function has been declared, look to the XML for
         any hinting which might be need to be displayed to the student.
 
         Returns true if we're using new style hints
         '''
-        using_new_style_hints = False           # assume we are not using new style hints
 
-        xproblem_element = self.xml.getroottree().xpath('.')
-        schema_version = xproblem_element[0].get('schema')
-        if schema_version and schema_version == '1.0':                # this is the right schema
-            using_new_style_hints = True
-            compound_hint_matched = False
+        new_style_hints = self._using_new_style_hints()      # are we using new style hints?
+        if new_style_hints:
 
-            selection_id_list = []
+
+
+            compound_hint_matched = False                           # assume no compound hints will match
+
+            selection_id_list = []                  # create a list of all the student's selected id's
             for problem in student_answers:
                 for student_answer in student_answers[problem]:
                     choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
                     choice = choice_list[0]
                     selection_id_list.append(choice.get('id'))
+            selection_id_list.sort()                # sort the list to make comparison easier
 
             compound_hints_list = self.xml.xpath('hints/hint')
             for compound_hint_element in compound_hints_list:
-                compound_hint_conditions_met = True         # assume all conditions will be met
 
-                condition_id_list = []
+                condition_id_list = []              # create a list of all the required selection id's
                 for condition_element in compound_hint_element.xpath('response'):
                     condition_id = condition_element.text.strip()
                     print condition_id
                     condition_id_list.append(condition_id)
+                condition_id_list.sort()            # sort the list to make comparison easier
 
-
-                if len(condition_id_list) != len(selection_id_list):
-                    print 'list counts differ'
-                    compound_hint_conditions_met = False
-                else:
-                    if condition_id_list.__contains__(choice.get('id')):
-                        print 'matched: ' + choice.get('id')
-                    else:
-                        print 'not matched: ' + choice.get('id')
-                        compound_hint_conditions_met = False
-
-
-
-                if compound_hint_conditions_met:
+                if condition_id_list == selection_id_list:
                     compound_hint_matched = True
                     new_cmap[problem]['msg'] = compound_hint_element.text.strip()
-
-
-
+                    break
 
             if not compound_hint_matched:                   # none of the compound conditions were met
                 for problem in student_answers:
@@ -336,7 +336,7 @@ class LoncapaResponse(object):
 
                         new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
 
-        return using_new_style_hints
+        return new_style_hints
 
 
 
@@ -362,7 +362,7 @@ class LoncapaResponse(object):
         """
         hintgroup = self.xml.find('hintgroup')
         if hintgroup is None:
-            if self._get_xml_hints(student_answers, new_cmap, old_cmap):    # if any new style hints were found
+            if self._get_xml_hints(student_answers, new_cmap):    # if any new style hints were found
                 return                                                      # exit to stop looking for hints
 
         # hint specified by function?
