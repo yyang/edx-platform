@@ -279,64 +279,64 @@ class LoncapaResponse(object):
         return using_new_style_hints
 
 
-    def _get_xml_hints(self, student_answers, new_cmap):
-        '''
-        Assuming no hint function has been declared, look to the XML for
-        any hinting which might be need to be displayed to the student.
+    def _get_compound_condition_hints(self, new_cmap, student_answers):
+        compound_hint_matched = False       # assume we won't find any matching rules
 
-        Returns true if we're using new style hints
-        '''
-
-        new_style_hints = self._using_new_style_hints()      # are we using new style hints?
-        if new_style_hints:
-
-
-
-            compound_hint_matched = False                           # assume no compound hints will match
-
-            selection_id_list = []                  # create a list of all the student's selected id's
-            for problem in student_answers:
-                for student_answer in student_answers[problem]:
-                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                    choice = choice_list[0]
-                    selection_id_list.append(choice.get('id'))
-            selection_id_list.sort()                # sort the list to make comparison easier
+        selection_id_list = []              # create a list of all the student's selected id's
+        for problem in student_answers:
+            for student_answer in student_answers[problem]:
+                choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                choice = choice_list[0]
+                selection_id_list.append(choice.get('id'))
+            selection_id_list.sort()        # sort the list to make comparison easier
 
             compound_hints_list = self.xml.xpath('hints/hint')
             for compound_hint_element in compound_hints_list:
 
-                condition_id_list = []              # create a list of all the required selection id's
+                condition_id_list = []      # create a list of all the required selection id's
                 for condition_element in compound_hint_element.xpath('response'):
                     condition_id = condition_element.text.strip()
                     print condition_id
                     condition_id_list.append(condition_id)
-                condition_id_list.sort()            # sort the list to make comparison easier
+                condition_id_list.sort()    # sort the list to make comparison easier
 
-                if condition_id_list == selection_id_list:
-                    compound_hint_matched = True
-                    new_cmap[problem]['msg'] = compound_hint_element.text.strip()
-                    break
+            if condition_id_list == selection_id_list:
+                compound_hint_matched = True
+                new_cmap[problem]['msg'] = compound_hint_element.text.strip()
+                break
+        return compound_hint_matched
 
-            if not compound_hint_matched:                   # none of the compound conditions were met
-                for problem in student_answers:
-                    for student_answer in student_answers[problem]:
-                        hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
-                        hint = hint_list[0]
 
-                        if hint.get('label'):
-                            correctness_string = hint.get('label') + ': '
-                        else:
-                            choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                            choice = choice_list[0]
+    def _get_single_line_hints(self, new_cmap, student_answers):
+        for problem in student_answers:
+            for student_answer in student_answers[problem]:
+                hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
+                hint = hint_list[0]
 
-                            correctness_string = 'INCORRECT: '      # assume the answer is incorrect
+                if hint.get('label'):
+                    correctness_string = hint.get('label') + ': '
+                else:
+                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                    choice = choice_list[0]
 
-                            if choice.get('correct') == 'true':
-                                correctness_string = 'CORRECT: '
+                    correctness_string = 'INCORRECT: '  # assume the answer is incorrect
 
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+                    if choice.get('correct') == 'true':
+                        correctness_string = 'CORRECT: '
 
-        return new_style_hints
+                new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+
+
+    def _get_xml_hints(self, student_answers, new_cmap):
+        '''
+        Look to the XML for any hinting which might be need to be displayed to the student.
+        If any hint material is discovered 'new_cmap' is modified accordingly for display
+        further downstream.
+        '''
+        if len(student_answers) > 0:                        # if the student has supplied at least one selection
+            if self._using_new_style_hints():               # if we are using new style hints
+                if not self._get_compound_condition_hints(new_cmap, student_answers):   # if no compound rules matched
+                    self._get_single_line_hints(new_cmap, student_answers)
 
 
 
@@ -361,9 +361,9 @@ class LoncapaResponse(object):
         Modifies new_cmap, by adding hints to answer_id entries as appropriate.
         """
         hintgroup = self.xml.find('hintgroup')
-        if hintgroup is None:
-            if self._get_xml_hints(student_answers, new_cmap):    # if any new style hints were found
-                return                                                      # exit to stop looking for hints
+        if hintgroup is None:                                   # no hint_fn has been provided
+            self._get_xml_hints(student_answers, new_cmap)      # if any new style hints were found
+            return                                              # exit to stop looking for hints
 
         # hint specified by function?
         hintfn = hintgroup.get('hintfn')
