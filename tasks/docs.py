@@ -11,6 +11,7 @@ DOC_PATHS = {
     "default": "docs/en_us"
 }
 
+
 def valid_doc_types():
     """
     Return a comma-separated string of valid doc types.
@@ -42,6 +43,7 @@ def doc_path(doc_type, allow_default=True):
                   doc_type=doc_type, options=valid_doc_types()))
         sys.exit(2)
     return path
+
 
 @task('prereqs.install',
       help={"type": "Type of docs to compile",
