@@ -250,21 +250,6 @@ class LoncapaResponse(object):
         # log.debug('new_cmap = %s' % new_cmap)
         return new_cmap
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def _using_new_style_hints(self):
         '''
         Examine the problem's XML tree to determine whether the "new style" hint mechanism is in use.
@@ -278,53 +263,23 @@ class LoncapaResponse(object):
             using_new_style_hints = True                            # turns out we are using new style hints
         return using_new_style_hints
 
-    def _get_compound_condition_hints(self, new_cmap, student_answers):
-        compound_hint_matched = False       # assume we won't find any matching rules
+    def get_compound_condition_hints(self, new_cmap, student_answers):
+        '''
+        Check for any compound condition hints for the current question. If any are found
+        and the selection matches the criteria specified, modify 'new_cmap'
+        appropriately so that the hint material can be rendered further downstream.
 
-        for problem in student_answers:
-            selection_id_list = []              # create a list of all the student's selected id's
-            for student_answer in student_answers[problem]:
-                choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                choice = choice_list[0]
-                selection_id_list.append(choice.get('id'))
-            selection_id_list.sort()        # sort the list to make comparison easier
+        Return True if any match was found
+        '''
+        return False
 
-            compound_hints_list = self.xml.xpath('hints/hint')
-            for compound_hint_element in compound_hints_list:
-
-                condition_id_list = []      # create a list of all the required selection id's
-                for condition_element in compound_hint_element.xpath('response'):
-                    condition_id = condition_element.text.strip()
-                    print condition_id
-                    condition_id_list.append(condition_id)
-                condition_id_list.sort()    # sort the list to make comparison easier
-
-            if condition_id_list == selection_id_list:
-                compound_hint_matched = True
-                new_cmap[problem]['msg'] = compound_hint_element.text.strip()
-                break
-        return compound_hint_matched
-
-
-    def _get_single_line_hints(self, new_cmap, student_answers):
-        for problem in student_answers:
-            for student_answer in student_answers[problem]:
-                hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
-                hint = hint_list[0]
-
-                if hint.get('label'):
-                    correctness_string = hint.get('label') + ': '
-                else:
-                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                    choice = choice_list[0]
-
-                    correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-
-                    if choice.get('correct') == 'true':
-                        correctness_string = 'CORRECT: '
-
-                new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
-
+    def get_single_line_hints(self, new_cmap, student_answers):
+        '''
+        Check for any single item hints for the current question. If any are found
+        and the selection matches the criteria specified, modify 'new_cmap'
+        appropriately so that the hint material can be rendered further downstream.
+        '''
+        pass
 
     def _get_xml_hints(self, student_answers, new_cmap):
         '''
@@ -334,21 +289,8 @@ class LoncapaResponse(object):
         '''
         if len(student_answers) > 0:                        # if the student has supplied at least one selection
             if self._using_new_style_hints():               # if we are using new style hints
-                if not self._get_compound_condition_hints(new_cmap, student_answers):   # if no compound rules matched
-                    self._get_single_line_hints(new_cmap, student_answers)
-
-
-
-
-
-
-
-
-
-
-
-
-
+                if not self.get_compound_condition_hints(new_cmap, student_answers):   # if no compound rules matched
+                    self.get_single_line_hints(new_cmap, student_answers)      # check for any single selection hints
 
     def get_hints(self, student_answers, new_cmap, old_cmap):
         """
@@ -734,9 +676,37 @@ class JavascriptResponse(LoncapaResponse):
         return {self.answer_id: self.solution}
 
 
+
+#-----------------------------------------------------------------------------
+class ChoicesResponse(LoncapaResponse):
+    '''
+    There are two distinct response types which use a common XML encoding
+    structure: ChoiceResponse and MultipleChoiceResponse. This minimal
+    layer of generalization is provided to allow both those subtypes to
+    share code related to the extraction of hint information from the XML.
+    '''
+    def get_single_line_hints(self, new_cmap, student_answers):
+        for problem in student_answers:
+            for student_answer in student_answers[problem]:
+                hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
+                hint = hint_list[0]
+
+                if hint.get('label'):
+                    correctness_string = hint.get('label') + ': '
+                else:
+                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                    choice = choice_list[0]
+
+                    correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+
+                    if choice.get('correct') == 'true':
+                        correctness_string = 'CORRECT: '
+
+                new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+
 #-----------------------------------------------------------------------------
 @registry.register
-class ChoiceResponse(LoncapaResponse):
+class ChoiceResponse(ChoicesResponse):
     """
     This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
@@ -829,12 +799,45 @@ class ChoiceResponse(LoncapaResponse):
 
     def get_answers(self):
         return {self.answer_id: list(self.correct_choices)}
+                
+    def get_compound_condition_hints(self, new_cmap, student_answers):
+        '''
+        Check for any compound condition hints for the current question. If any are found
+        and the selection matches the criteria specified, modify 'new_cmap'
+        appropriately so that the hint material can be rendered further downstream.
+        '''
+        compound_hint_matched = False       # assume we won't find any matching rules
+
+        for problem in student_answers:
+            selection_id_list = []              # create a list of all the student's selected id's
+            for student_answer in student_answers[problem]:
+                choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                if choice_list:             # if we found at least one choice element
+                    choice = choice_list[0]
+                    selection_id_list.append(choice.get('id'))
+            selection_id_list.sort()        # sort the list to make comparison easier
+
+            compound_hints_list = self.xml.xpath('hints/hint')
+            for compound_hint_element in compound_hints_list:
+
+                condition_id_list = []      # create a list of all the required selection id's
+                for condition_element in compound_hint_element.xpath('response'):
+                    condition_id = condition_element.text.strip()
+                    print condition_id
+                    condition_id_list.append(condition_id)
+                condition_id_list.sort()    # sort the list to make comparison easier
+
+            if condition_id_list == selection_id_list:
+                compound_hint_matched = True
+                new_cmap[problem]['msg'] = compound_hint_element.text.strip()
+                break
+        return compound_hint_matched
 
 #-----------------------------------------------------------------------------
 
 
 @registry.register
-class MultipleChoiceResponse(LoncapaResponse):
+class MultipleChoiceResponse(ChoicesResponse):
     """
     Multiple Choice Response
     The shuffle and answer-pool features on this class enable permuting and
@@ -3241,3 +3244,27 @@ __all__ = [CodeResponse,
            JavascriptResponse,
            AnnotationResponse,
            ChoiceTextResponse]
+
+
+#-----------------------------------------------------------------------------
+# Test cases to remember:
+#
+#     * no items selected by the student
+#         - with at least one item marked correct by author
+#         - with none of the items marked correct by author
+#
+#     * all items selected by the student
+#         - every hint string is shown to student if no compound condition includes all choices
+#         - compound case if specified
+#
+#     * hint is reused via <hint idref="otherHintId"
+#
+#     * CORRECT/INCORRECT
+#         - appears properly to match green check/red X
+#               . compound conditions
+#               . no compound matches
+#         - override works properly to match green check/red X
+#               . compound conditions
+#               . no compound matches
+
+#
