@@ -8,6 +8,7 @@ of a variety of types.
 Used by capa_problem.py
 """
 
+
 # standard library imports
 import abc
 import cgi
@@ -685,10 +686,13 @@ class ChoicesResponse(LoncapaResponse):
     layer of generalization is provided to allow both those subtypes to
     share code related to the extraction of hint information from the XML.
     '''
+    def __init__(self):
+            hint_tag = 'choicehint'
+
     def get_single_line_hints(self, new_cmap, student_answers):
         for problem in student_answers:
             for student_answer in student_answers[problem]:
-                hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /hint')
+                hint_list = self.xml.xpath('choicegroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
                 hint = hint_list[0]
 
                 if hint.get('label'):
