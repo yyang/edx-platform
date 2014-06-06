@@ -678,6 +678,13 @@ class JavascriptResponse(LoncapaResponse):
 
 
 
+
+
+
+
+
+
+
 #-----------------------------------------------------------------------------
 class ChoicesResponse(LoncapaResponse):
     '''
