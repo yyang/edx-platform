@@ -797,6 +797,8 @@ class ChoiceResponse(LoncapaResponse):
 
         for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
                                                       id=self.xml.get('id'))):
+            if choice.get('id') == None:
+                choice.set("id", chr(ord("A") + index))   # each choice gets a default 'id' of A,B,C...
             choice.set("name", "choice_" + str(index))
 
     def get_score(self, student_answers):
@@ -831,18 +833,19 @@ class ChoiceResponse(LoncapaResponse):
                 if hint_list:
                     hint = hint_list[0]
 
-                    if hint.get('label'):
-                        correctness_string = hint.get('label') + ': '
-                    else:
-                        choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                        choice = choice_list[0]
+                    if hint != None and hint.text != None and len(hint.text.strip()) > 0: # if there is a string to show
+                        if hint.get('label'):
+                            correctness_string = hint.get('label') + ': '
+                        else:
+                            choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                            choice = choice_list[0]
 
-                        correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
 
-                        if choice.get('correct') == 'True':
-                            correctness_string = 'CORRECT: '
+                            if choice.get('correct') == 'True':
+                                correctness_string = 'CORRECT: '
 
-                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + hint.text.strip() + '</p>'
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
         '''
