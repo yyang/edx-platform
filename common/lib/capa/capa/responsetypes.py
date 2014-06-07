@@ -274,7 +274,7 @@ class LoncapaResponse(object):
         '''
         return False
 
-    def get_single_line_hints(self, new_cmap, student_answers):
+    def get_single_choice_hints(self, new_cmap, student_answers):
         '''
         Check for any single item hints for the current question. If any are found
         and the selection matches the criteria specified, modify 'new_cmap'
@@ -295,7 +295,7 @@ class LoncapaResponse(object):
             if self._using_new_style_hints():               # if we are using new style hints
                 new_style_hints_found = True                # note that new style hints may be used
                 if not self.get_compound_condition_hints(new_cmap, student_answers):   # if no compound rules matched
-                    self.get_single_line_hints(new_cmap, student_answers)      # check for any single selection hints
+                    self.get_single_choice_hints(new_cmap, student_answers)      # check for any single selection hints
         return new_style_hints_found
 
     def get_hints(self, student_answers, new_cmap, old_cmap):
@@ -387,8 +387,9 @@ class LoncapaResponse(object):
                 # </formularesponse>
 
                 if (self.hint_tag is not None
+                    and hintgroup
                     and hintgroup.find(self.hint_tag) is not None
-                        and hasattr(self, 'check_hint_condition')):
+                    and hasattr(self, 'check_hint_condition')):
 
                     rephints = hintgroup.findall(self.hint_tag)
                     hints_to_show = self.check_hint_condition(
@@ -706,7 +707,7 @@ class JavascriptResponse(LoncapaResponse):
 #     def setup_response(self):
 #         pass
 #
-#     def get_single_line_hints(self, new_cmap, student_answers):
+#     def get_single_choice_hints(self, new_cmap, student_answers):
 #         for problem in student_answers:
 #             for student_answer in student_answers[problem]:
 #                 hint_list = self.xml.xpath('choicegroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
@@ -824,7 +825,7 @@ class ChoiceResponse(LoncapaResponse):
             answers = {self.answer_id: list(self.correct_choices)}
         return answers
 
-    def get_single_line_hints(self, new_cmap, student_answers):
+    def get_single_choice_hints(self, new_cmap, student_answers):
         for problem in student_answers:
             for student_answer in student_answers[problem]:
                 hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
@@ -862,7 +863,7 @@ class ChoiceResponse(LoncapaResponse):
             selection_id_list.sort()        # sort the list to make comparison easier
 
             condition_id_list = []      # create a list of all the required selection id's
-            compound_hints_list = self.xml.xpath('hints/hint')
+            compound_hints_list = self.xml.xpath('hintgroup/choicehint')
             for compound_hint_element in compound_hints_list:
                 for condition_element in compound_hint_element.xpath('response'):
                     condition_id = condition_element.text.strip()
@@ -921,16 +922,6 @@ class MultipleChoiceResponse(LoncapaResponse):
             if contextualize_text(choice.get('correct'), self.context) == "True"
         ]
 
-    # def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
-    #     '''
-    #     Assuming no hint function has been declared, look to the XML for
-    #     any hinting which might be need to be displayed to the student.
-    #     '''
-    #     print(etree.tostring(           self.xml.xpath('checkboxgroup/choice [@name="choice_2"]') [0]                      , pretty_print=True))
-    #     for problem in student_answers:
-    #         print 'problem: ' + problem
-    #         for choice in student_answers[problem]:
-    #             print '    choice: ' + choice
 
     def mc_setup_response(self):
         """
