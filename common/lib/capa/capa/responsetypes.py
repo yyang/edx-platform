@@ -1186,47 +1186,6 @@ class MultipleChoiceResponse(LoncapaResponse):
     def get_single_choice_hints(self, new_cmap, student_answers):
         return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choicegroup')
 
-    # def get_single_choice_hints(self, new_cmap, student_answers):
-    #
-    #     # NOTE: this is almost an exact copy of the code in ChoiceResponse -- this function should be migrated up to a
-    #     #       common superclass or ChoiceResponse and MultipleChoiceResponse classes should be merged (because
-    #     #       the latter is merely a special case of the former).
-    #
-    #     '''
-    #     Check the XML for any hints which should be delivered to the student based
-    #     on the answer choices made.
-    #
-    #     :param new_cmap:        the 'correct map' to which applicable hints will be
-    #                             added for display by downstream code
-    #     :param student_answers: the set of answer choices made by the student
-    #     :return:                nothing
-    #     '''
-    #     for problem in student_answers:
-    #
-    #         student_answer_list = student_answers[problem]
-    #         if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-    #             student_answer_list = [student_answer_list]     # cast it as a true list
-    #
-    #         for student_answer in student_answer_list:
-    #             hint_list = self.xml.xpath('choicegroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
-    #             if hint_list:
-    #                 hint = hint_list[0]
-    #
-    #                 if hint != None and hint.text != None and len(hint.text.strip()) > 0: # if there is a string to show
-    #                     if hint.get('label'):
-    #                         correctness_string = hint.get('label') + ': '
-    #                     else:
-    #                         choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-    #                         choice = choice_list[0]
-    #
-    #                         correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-    #
-    #                         if choice.get('correct') == 'True':
-    #                             correctness_string = 'CORRECT: '
-    #
-    #                     new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + hint.text.strip() + '</p>'
-
-
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
