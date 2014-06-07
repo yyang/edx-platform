@@ -282,16 +282,21 @@ class LoncapaResponse(object):
         '''
         pass
 
-    def _get_xml_hints(self, student_answers, new_cmap):
+    def get_xml_hints(self, student_answers, new_cmap):
         '''
         Look to the XML for any hinting which might be need to be displayed to the student.
         If any hint material is discovered 'new_cmap' is modified accordingly for display
         further downstream.
+
+        Return True if new style hints were found
         '''
+        new_style_hints_found = False
         if len(student_answers) > 0:                        # if the student has supplied at least one selection
             if self._using_new_style_hints():               # if we are using new style hints
+                new_style_hints_found = True                # note that new style hints may be used
                 if not self.get_compound_condition_hints(new_cmap, student_answers):   # if no compound rules matched
                     self.get_single_line_hints(new_cmap, student_answers)      # check for any single selection hints
+        return new_style_hints_found
 
     def get_hints(self, student_answers, new_cmap, old_cmap):
         """
@@ -302,14 +307,16 @@ class LoncapaResponse(object):
 
         Modifies new_cmap, by adding hints to answer_id entries as appropriate.
         """
-        hintgroup = self.xml.find('hintgroup')
-        if hintgroup is None:                                   # no hint_fn has been provided
-            self._get_xml_hints(student_answers, new_cmap)      # if any new style hints were found
-            return                                              # exit to stop looking for hints
 
-        # hint specified by function?
-        hintfn = hintgroup.get('hintfn')
-        if hintfn:
+        hintfn = None
+        hint_function_provided = False
+        hintgroup = self.xml.find('hintgroup')
+        if hintgroup:
+            hintfn = hintgroup.get('hintfn')
+            if hintfn:
+                hint_function_provided = True
+
+        if hint_function_provided:
             # Hint is determined by a function defined in the <script> context; evaluate
             # that function to obtain list of hint, hintmode for each answer_id.
 
@@ -361,42 +368,42 @@ class LoncapaResponse(object):
                 raise ResponseError(msg)
 
             new_cmap.set_dict(globals_dict['new_cmap_dict'])
-            return
+        else:                   # no hint function provided
+            if not self.get_xml_hints(student_answers, new_cmap):     # if new style hints were not found
+                # hint specified by conditions and text dependent on conditions (a-la Loncapa design)
+                # see http://help.loncapa.org/cgi-bin/fom?file=291
+                #
+                # Example:
+                #
+                # <formularesponse samples="x@-5:5#11" id="11" answer="$answer">
+                #   <textline size="25" />
+                #   <hintgroup>
+                #     <formulahint samples="x@-5:5#11" answer="$wrongans" name="inversegrad"></formulahint>
+                #     <hintpart on="inversegrad">
+                #       <text>You have inverted the slope in the question.  The slope is
+                #             (y2-y1)/(x2 - x1) you have the slope as (x2-x1)/(y2-y1).</text>
+                #     </hintpart>
+                #   </hintgroup>
+                # </formularesponse>
 
-        # hint specified by conditions and text dependent on conditions (a-la Loncapa design)
-        # see http://help.loncapa.org/cgi-bin/fom?file=291
-        #
-        # Example:
-        #
-        # <formularesponse samples="x@-5:5#11" id="11" answer="$answer">
-        #   <textline size="25" />
-        #   <hintgroup>
-        #     <formulahint samples="x@-5:5#11" answer="$wrongans" name="inversegrad"></formulahint>
-        #     <hintpart on="inversegrad">
-        #       <text>You have inverted the slope in the question.  The slope is
-        #             (y2-y1)/(x2 - x1) you have the slope as (x2-x1)/(y2-y1).</text>
-        #     </hintpart>
-        #   </hintgroup>
-        # </formularesponse>
+                if (self.hint_tag is not None
+                    and hintgroup.find(self.hint_tag) is not None
+                        and hasattr(self, 'check_hint_condition')):
 
-        if (self.hint_tag is not None
-            and hintgroup.find(self.hint_tag) is not None
-                and hasattr(self, 'check_hint_condition')):
+                    rephints = hintgroup.findall(self.hint_tag)
+                    hints_to_show = self.check_hint_condition(
+                        rephints, student_answers)
+                    # can be 'on_request' or 'always' (default)
 
-            rephints = hintgroup.findall(self.hint_tag)
-            hints_to_show = self.check_hint_condition(
-                rephints, student_answers)
-            # can be 'on_request' or 'always' (default)
-
-            hintmode = hintgroup.get('mode', 'always')
-            for hintpart in hintgroup.findall('hintpart'):
-                if hintpart.get('on') in hints_to_show:
-                    hint_text = hintpart.find('text').text
-                    # make the hint appear after the last answer box in this
-                    # response
-                    aid = self.answer_ids[-1]
-                    new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
-            log.debug('after hint: new_cmap = %s', new_cmap)
+                    hintmode = hintgroup.get('mode', 'always')
+                    for hintpart in hintgroup.findall('hintpart'):
+                        if hintpart.get('on') in hints_to_show:
+                            hint_text = hintpart.find('text').text
+                            # make the hint appear after the last answer box in this
+                            # response
+                            aid = self.answer_ids[-1]
+                            new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
+                    log.debug('after hint: new_cmap = %s', new_cmap)
 
     @abc.abstractmethod
     def get_score(self, student_answers):
@@ -684,40 +691,43 @@ class JavascriptResponse(LoncapaResponse):
 
 
 
-
-#-----------------------------------------------------------------------------
-class ChoicesResponse(LoncapaResponse):
-    '''
-    There are two distinct response types which use a common XML encoding
-    structure: ChoiceResponse and MultipleChoiceResponse. This minimal
-    layer of generalization is provided to allow both those subtypes to
-    share code related to the extraction of hint information from the XML.
-    '''
-    def __init__(self):
-            hint_tag = 'choicehint'
-
-    def get_single_line_hints(self, new_cmap, student_answers):
-        for problem in student_answers:
-            for student_answer in student_answers[problem]:
-                hint_list = self.xml.xpath('choicegroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
-                hint = hint_list[0]
-
-                if hint.get('label'):
-                    correctness_string = hint.get('label') + ': '
-                else:
-                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                    choice = choice_list[0]
-
-                    correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-
-                    if choice.get('correct') == 'true':
-                        correctness_string = 'CORRECT: '
-
-                new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+#
+# #-----------------------------------------------------------------------------
+# class ChoicesResponse(LoncapaResponse):
+#     '''
+#     There are two distinct response types which use a common XML encoding
+#     structure: ChoiceResponse and MultipleChoiceResponse. This minimal
+#     layer of generalization is provided to allow both those subtypes to
+#     share code related to the extraction of hint information from the XML.
+#     '''
+#     def __init__(self, xml, inputfields, context, system):
+#         hint_tag = 'choicehint'
+#
+#     def setup_response(self):
+#         pass
+#
+#     def get_single_line_hints(self, new_cmap, student_answers):
+#         for problem in student_answers:
+#             for student_answer in student_answers[problem]:
+#                 hint_list = self.xml.xpath('choicegroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
+#                 hint = hint_list[0]
+#
+#                 if hint.get('label'):
+#                     correctness_string = hint.get('label') + ': '
+#                 else:
+#                     choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+#                     choice = choice_list[0]
+#
+#                     correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+#
+#                     if choice.get('correct') == 'True':
+#                         correctness_string = 'CORRECT: '
+#
+#                 new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
 
 #-----------------------------------------------------------------------------
 @registry.register
-class ChoiceResponse(ChoicesResponse):
+class ChoiceResponse(LoncapaResponse):
     """
     This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
@@ -743,13 +753,13 @@ class ChoiceResponse(ChoicesResponse):
 
     <choiceresponse>
         <radiogroup>
-            <choice correct="false">
+            <choice correct="False">
                 <text>This is a wrong answer.</text>
             </choice>
-            <choice correct="true">
+            <choice correct="True">
                 <text>This is the right answer.</text>
             </choice>
-            <choice correct="false">
+            <choice correct="False">
                 <text>This is another wrong answer.</text>
             </choice>
         </radiogroup>
@@ -764,8 +774,8 @@ class ChoiceResponse(ChoicesResponse):
     and it'd be nice to change this at some point.
 
     """
-
     tags = ['choiceresponse']
+    hint_tag = 'choicehint'
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
     correct_choices = None
@@ -774,7 +784,7 @@ class ChoiceResponse(ChoicesResponse):
 
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="True"]',
                                      id=self.xml.get('id'))
 
         self.correct_choices = set([choice.get(
@@ -809,8 +819,31 @@ class ChoiceResponse(ChoicesResponse):
             return CorrectMap(self.answer_id, 'incorrect')
 
     def get_answers(self):
-        return {self.answer_id: list(self.correct_choices)}
-                
+        answers = []
+        if self.correct_choices != None:
+            answers = {self.answer_id: list(self.correct_choices)}
+        return answers
+
+    def get_single_line_hints(self, new_cmap, student_answers):
+        for problem in student_answers:
+            for student_answer in student_answers[problem]:
+                hint_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
+                if hint_list:
+                    hint = hint_list[0]
+
+                    if hint.get('label'):
+                        correctness_string = hint.get('label') + ': '
+                    else:
+                        choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                        choice = choice_list[0]
+
+                        correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+
+                        if choice.get('correct') == 'True':
+                            correctness_string = 'CORRECT: '
+
+                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + correctness_string + hint.text.strip() + '  ||  '
+
     def get_compound_condition_hints(self, new_cmap, student_answers):
         '''
         Check for any compound condition hints for the current question. If any are found
@@ -828,10 +861,9 @@ class ChoiceResponse(ChoicesResponse):
                     selection_id_list.append(choice.get('id'))
             selection_id_list.sort()        # sort the list to make comparison easier
 
+            condition_id_list = []      # create a list of all the required selection id's
             compound_hints_list = self.xml.xpath('hints/hint')
             for compound_hint_element in compound_hints_list:
-
-                condition_id_list = []      # create a list of all the required selection id's
                 for condition_element in compound_hint_element.xpath('response'):
                     condition_id = condition_element.text.strip()
                     print condition_id
@@ -848,7 +880,7 @@ class ChoiceResponse(ChoicesResponse):
 
 
 @registry.register
-class MultipleChoiceResponse(ChoicesResponse):
+class MultipleChoiceResponse(LoncapaResponse):
     """
     Multiple Choice Response
     The shuffle and answer-pool features on this class enable permuting and
@@ -882,11 +914,11 @@ class MultipleChoiceResponse(ChoicesResponse):
         cxml = xml.xpath('//*[@id=$id]//choice', id=xml.get('id'))
 
         # contextualize correct attribute and then select ones for which
-        # correct = "true"
+        # correct = "True"
         self.correct_choices = [
             contextualize_text(choice.get('name'), self.context)
             for choice in cxml
-            if contextualize_text(choice.get('correct'), self.context) == "true"
+            if contextualize_text(choice.get('correct'), self.context) == "True"
         ]
 
     # def _get_xml_hints(self, student_answers, new_cmap, old_cmap):
@@ -978,7 +1010,7 @@ class MultipleChoiceResponse(ChoicesResponse):
 
     def do_shuffle(self, tree, problem):
         """
-        For a choicegroup with shuffle="true", shuffles the choices in-place in the given tree
+        For a choicegroup with shuffle="True", shuffles the choices in-place in the given tree
         based on the seed. Otherwise does nothing.
         Raises LoncapaProblemError if both shuffle and answer-pool are active:
         a problem should use one or the other but not both.
@@ -986,7 +1018,7 @@ class MultipleChoiceResponse(ChoicesResponse):
         """
         # The tree is already pared down to this <multichoiceresponse> so this query just
         # gets the child choicegroup (i.e. no leading //)
-        choicegroups = tree.xpath('choicegroup[@shuffle="true"]')
+        choicegroups = tree.xpath('choicegroup[@shuffle="True"]')
         if choicegroups:
             choicegroup = choicegroups[0]
             if choicegroup.get('answer-pool') is not None:
@@ -1011,11 +1043,11 @@ class MultipleChoiceResponse(ChoicesResponse):
         """
         Returns a list of choice nodes with the shuffling done,
         using the provided random number generator.
-        Choices with 'fixed'='true' are held back from the shuffle.
+        Choices with 'fixed'='True' are held back from the shuffle.
         """
         # Separate out a list of the stuff to be shuffled
-        # vs. the head/tail of fixed==true choices to be held back from the shuffle.
-        # Rare corner case: A fixed==true choice "island" in the middle is lumped in
+        # vs. the head/tail of fixed==True choices to be held back from the shuffle.
+        # Rare corner case: A fixed==True choice "island" in the middle is lumped in
         # with the tail group of fixed choices.
         # Slightly tricky one-pass implementation using a state machine
         head = []
@@ -1023,11 +1055,11 @@ class MultipleChoiceResponse(ChoicesResponse):
         tail = []
         at_head = True
         for choice in choices:
-            if at_head and choice.get('fixed') == 'true':
+            if at_head and choice.get('fixed') == 'True':
                 head.append(choice)
                 continue
             at_head = False
-            if choice.get('fixed') == 'true':
+            if choice.get('fixed') == 'True':
                 tail.append(choice)
             else:
                 middle.append(choice)
@@ -1126,12 +1158,12 @@ class MultipleChoiceResponse(ChoicesResponse):
         incorrect_choices = []
 
         for choice in choices:
-            if choice.get('correct') == 'true':
+            if choice.get('correct') == 'True':
                 correct_choices.append(choice)
             else:
                 incorrect_choices.append(choice)
                 # In my small test, capa seems to treat the absence of any correct=
-                # attribute as equivalent to ="false", so that's what we do here.
+                # attribute as equivalent to ="False", so that's what we do here.
 
         # We raise an error if the problem is highly ill-formed.
         # There must be at least one correct and one incorrect choice.
@@ -1166,7 +1198,7 @@ class MultipleChoiceResponse(ChoicesResponse):
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
-    tags = ['truefalseresponse']
+    tags = ['TrueFalseresponse']
 
     def mc_setup_response(self):
         i = 0
@@ -1477,8 +1509,8 @@ class StringResponse(LoncapaResponse):
         """
         Find given in expected.
 
-        If self.regexp is true, regular expression search is used.
-        if self.case_insensitive is true, case insensitive search is used, otherwise case sensitive search is used.
+        If self.regexp is True, regular expression search is used.
+        if self.case_insensitive is True, case insensitive search is used, otherwise case sensitive search is used.
         Spaces around values of attributes are stripped in XML parsing step.
 
         Args:
@@ -2939,7 +2971,7 @@ class ChoiceTextResponse(LoncapaResponse):
         context = self.context
         self.answer_values = {self.answer_id: []}
         self.assign_choice_names()
-        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="True"]',
                                      id=self.xml.get('id'))
 
         for node in correct_xml:
@@ -2992,12 +3024,12 @@ class ChoiceTextResponse(LoncapaResponse):
 
         Before the function is called `self.xml` =
         <radiotextgroup>
-            <choice correct = "true">
+            <choice correct = "True">
                 The number
                     <numtolerance_input answer="5"/>
                 Is the mean of the list.
             </choice>
-            <choice correct = "false">
+            <choice correct = "False">
                 False demonstration choice
             </choice>
         </radiotextgroup>
@@ -3006,13 +3038,13 @@ class ChoiceTextResponse(LoncapaResponse):
         attribute initialized and self.xml will be:
 
         <radiotextgroup>
-        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
+        <choice correct = "True" name ="1_2_1_choiceinput_0bc">
             The number
                 <numtolerance_input name = "1_2_1_choiceinput0_numtolerance_input_0"
                  answer="5"/>
             Is the mean of the list.
         </choice>
-        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
+        <choice correct = "False" name = "1_2_1_choiceinput_1bc>
             False demonstration choice
         </choice>
         </radiotextgroup>
@@ -3277,5 +3309,7 @@ __all__ = [CodeResponse,
 #         - override works properly to match green check/red X
 #               . compound conditions
 #               . no compound matches
-
+#
+#     * no single item hints provided in the question
+#     * no compound hints provided in the question
 #
