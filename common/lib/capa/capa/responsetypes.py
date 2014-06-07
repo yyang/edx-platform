@@ -785,8 +785,7 @@ class ChoiceResponse(LoncapaResponse):
 
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="True"]',
-                                     id=self.xml.get('id'))
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="True" or @correct="true"]', id=self.xml.get('id'))
 
         self.correct_choices = set([choice.get(
             'name') for choice in correct_xml])
