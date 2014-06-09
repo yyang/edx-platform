@@ -108,6 +108,9 @@ FEATURES = {
 }
 ENABLE_JASMINE = False
 
+# Ignore static asset files on import which match this pattern
+ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
+
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
