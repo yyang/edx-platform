@@ -156,7 +156,6 @@ class LoncapaProblem(object):
         # Convert startouttext and endouttext to proper <text></text>
         problem_text = re.sub(r"startouttext\s*/", "text", problem_text)
         problem_text = re.sub(r"endouttext\s*/", "/text", problem_text)
-        self.problem_text = problem_text
 
         # parse problem XML file into an element tree
         self.tree = etree.XML(problem_text)
