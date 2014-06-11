@@ -441,7 +441,9 @@ class LoncapaResponse(object):
         pass
 
     def setup_response(self):
-        pass
+        # remove hints elements (if any) from xml, otherwise they will be displayed
+        for element in self.xml.findall('hints'):
+            element.parent.remove(element)
 
     def __unicode__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
@@ -542,6 +544,7 @@ class JavascriptResponse(LoncapaResponse):
     allowed_inputfields = ['javascriptinput']
 
     def setup_response(self):
+        super(JavascriptResponse, self).setup_response()
 
         # Sets up generator, grader, display, and their dependencies.
         self.parse_xml()
@@ -788,6 +791,7 @@ class ChoiceResponse(LoncapaResponse):
     correct_choices = None
 
     def setup_response(self):
+        super(ChoiceResponse, self).setup_response()
 
         self.assign_choice_names()
 
@@ -906,6 +910,8 @@ class MultipleChoiceResponse(LoncapaResponse):
     correct_choices = None
 
     def setup_response(self):
+        super(MultipleChoiceResponse, self).setup_response()
+
         # call secondary setup for MultipleChoice questions, to set name
         # attributes
         self.mc_setup_response()
@@ -1228,6 +1234,8 @@ class OptionResponse(LoncapaResponse):
     answer_fields = None
 
     def setup_response(self):
+        super(OptionResponse, self).setup_response()
+
         self.answer_fields = self.inputfields
 
     def get_score(self, student_answers):
@@ -1271,6 +1279,8 @@ class NumericalResponse(LoncapaResponse):
         super(NumericalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(NumericalResponse, self).setup_response()
+
         xml = self.xml
         context = self.context
         answer = xml.get('answer')
@@ -1466,6 +1476,7 @@ class StringResponse(LoncapaResponse):
         ]
 
     def setup_response(self):
+        super(StringResponse, self).setup_response()
 
         self.backward = '_or_' in self.xml.get('answer').lower()
         self.regexp = False
@@ -1486,6 +1497,12 @@ class StringResponse(LoncapaResponse):
         # remove additional_answer from xml, otherwise they will be displayed
         for el in self.xml.findall('additional_answer'):
             self.xml.remove(el)
+
+        # remove incorrect_answer from xml, otherwise they will be displayed
+        for el in self.xml.findall('incorrect_answer'):
+            self.xml.remove(el)
+
+
 
     def get_score(self, student_answers):
         """Grade a string response """
@@ -1662,6 +1679,8 @@ class CustomResponse(LoncapaResponse):
     expect = None
 
     def setup_response(self):
+        super(CustomResponse, self).setup_response()
+
         xml = self.xml
 
         # if <customresponse> has an "expect" (or "answer") attribute then save
@@ -1994,6 +2013,8 @@ class SymbolicResponse(CustomResponse):
     max_inputfields = 1
 
     def setup_response(self):
+        super(SymbolicResponse, self).setup_response()
+
         # Symbolic response always uses symmath_check()
         # If the XML did not specify this, then set it now
         # Otherwise, we get an error from the superclass
@@ -2073,6 +2094,8 @@ class CodeResponse(LoncapaResponse):
 
         TODO: Determines whether in synchronous or asynchronous (queued) mode
         """
+        super(CodeResponse, self).setup_response()
+
         xml = self.xml
         # TODO: XML can override external resource (grader/queue) URL
         self.url = xml.get('url', None)
@@ -2342,6 +2365,8 @@ class ExternalResponse(LoncapaResponse):
         super(ExternalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(ExternalResponse, self).setup_response()
+
         xml = self.xml
         # FIXME - hardcoded URL
         self.url = xml.get('url') or "http://qisx.mit.edu:8889/pyloncapa"
@@ -2499,6 +2524,8 @@ class FormulaResponse(LoncapaResponse):
         super(FormulaResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(FormulaResponse, self).setup_response()
+
         xml = self.xml
         context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
@@ -2705,6 +2732,8 @@ class SchematicResponse(LoncapaResponse):
         super(SchematicResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(SchematicResponse, self).setup_response()
+
         xml = self.xml
         answer = xml.xpath('//*[@id=$id]//answer', id=xml.get('id'))[0]
         answer_src = answer.get('src')
@@ -2781,6 +2810,8 @@ class ImageResponse(LoncapaResponse):
         super(ImageResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(ImageResponse, self).setup_response()
+
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id') for ie in self.ielements]
 
@@ -2902,6 +2933,8 @@ class AnnotationResponse(LoncapaResponse):
         super(AnnotationResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
+        super(AnnotationResponse, self).setup_response()
+
         self.scoring_map = self._get_scoring_map()
         self.answer_map = self._get_answer_map()
         self.maxpoints = self._get_max_points()
@@ -3042,6 +3075,8 @@ class ChoiceTextResponse(LoncapaResponse):
         and `answer_values` is used for displaying correct answers.
 
         """
+        super(ChoiceTextResponse, self).setup_response()
+
         _ = self.capa_system.i18n.ugettext
         context = self.context
         self.answer_values = {self.answer_id: []}
