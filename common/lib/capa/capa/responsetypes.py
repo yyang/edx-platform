@@ -440,10 +440,24 @@ class LoncapaResponse(object):
         """
         pass
 
+    def _extract_problem_hints(self):
+        '''
+        Find any problem hints (as distinct from question hints which provide a form
+        of 'targeted feedback') in the XML for the problem. If any are found,
+        create a list of them for later use then remove the XML elements to keep
+        them from being displayed to student (via the XML, that is).
+        :return: Nothing
+        '''
+        problem_hint_list = []
+        problem_element = self.xml.getparent()
+        for hint_element in problem_element.findall('hints/hint'):
+            problem_hint_list.append(hint_element.text.strip())
+
+        for hint_element in problem_element.xpath('//hint'):
+            hint_element.getparent().remove(hint_element)
+
     def setup_response(self):
-        # remove hints elements (if any) from xml, otherwise they will be displayed
-        for element in self.xml.findall('hints'):
-            element.parent.remove(element)
+        self._extract_problem_hints()
 
     def __unicode__(self):
         return u'LoncapaProblem Response %s' % self.xml.tag
@@ -511,7 +525,7 @@ class LoncapaResponse(object):
                 student_answer_list = [student_answer_list]     # cast it as a true list
 
             for student_answer in student_answer_list:
-                hint_list = self.xml.xpath(group_name + '/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
+                hint_list = self.xml.xpath(group_name + '/choice [@name="' + str(student_answer) + '"] /hint')
                 if hint_list:
                     hint = hint_list[0]
 
@@ -861,7 +875,7 @@ class ChoiceResponse(LoncapaResponse):
             selection_id_list.sort()        # sort the list to make comparison easier
 
             condition_id_list = []      # create a list of all the required selection id's
-            compound_hints_list = self.xml.xpath('hintgroup/choicehint')
+            compound_hints_list = self.xml.xpath('hints/hint')
             for compound_hint_element in compound_hints_list:
                 for condition_element in compound_hint_element.xpath('response'):
                     condition_id = condition_element.text.strip()
@@ -1538,54 +1552,28 @@ class StringResponse(LoncapaResponse):
             for primary_answer in self.original_xml.xpath('//stringresponse'):          # check the primary answer first
                 if self.check_hint_condition_match(primary_answer.get('answer'), student_answer):
                     for primary_hint in self.original_xml.xpath('//stringresponse/hint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<span class="correct_hint">CORRECT: ' + primary_hint.text.strip() + '</span>'
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + primary_hint.text.strip() + '</div>'
 
             for additional_answer in self.original_xml.xpath('//additional_answer'):    # check all add'l answers
                 if self.check_hint_condition_match(additional_answer.text, student_answer):
                     for additional_answer_hint in self.original_xml.xpath('//stringresponse/additional_answer/hint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<span class="correct_hint">CORRECT: ' + additional_answer_hint.text.strip() + '</span>'
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
 
             for incorrect_answer in self.original_xml.xpath('//incorrect_answer'):      # check all incorrect answers
                 if self.check_hint_condition_match(incorrect_answer.text, student_answer):
                     for incorrect_answer_hint in self.original_xml.xpath('//stringresponse/incorrect_answer/hint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<span class="correct_hint">CORRECT: ' + incorrect_answer_hint.text.strip() + '</span>'
-
-
-            # for student_answer in student_answer_list:
-            #     for hint_element in self.original_tree.xpath('//stringresponse/' + self.hint_tag):
-            #         primary_
-            #
-            #
-            #
-            #
-            #
-            #
-            #     hint_list = self.original_tree.xpath(group_name + '/choice [@name="' + str(student_answer) + '"] /' + self.hint_tag)
-            #     if hint_list:
-            #         hint = hint_list[0]
-            #
-            #         if hint != None and hint.text != None and len(hint.text.strip()) > 0: # if there is a string to show
-            #             if hint.get('label'):
-            #                 correctness_string = hint.get('label') + ': '
-            #             else:
-            #                 choice_list = self.original_tree.xpath(group_name + '/choice [@name="' + str(student_answer) + '"]')
-            #                 choice = choice_list[0]
-            #
-            #                 correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-            #
-            #                 if choice.get('correct') == 'True':
-            #                     correctness_string = 'CORRECT: '
-            #
-            #             new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + hint.text.strip() + '</p>'
-
-
-
-
-
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
     def check_hint_condition_match(self, regex, answer):
+        '''
+        Attempt to match a regular expression against the student answer. Return True if a match is made.
+        :param regex:   regular expression to use in attempting the match
+        :param answer:  student's answer string
+        :return:        True if the expression matches
+        '''
         try:
-            regexp = re.compile(regex.strip(), flags=re.IGNORECASE | re.UNICODE)
+            flags = re.IGNORECASE if self.case_insensitive else 0
+            regexp = re.compile(regex.strip(), flags=flags | re.UNICODE)
             return bool(re.search(regexp, answer.strip()))
         except Exception as err:
             msg = u'Illegal regex expression: ' + regex     # NOTE: this line needs internationalization
