@@ -621,6 +621,8 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'show_hint_button':self.show_hint_button,
+            'next_hint_index':self.next_hint_index,
         }
 
         html = self.runtime.render_template('problem.html', context)
