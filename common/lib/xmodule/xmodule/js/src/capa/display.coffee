@@ -295,18 +295,27 @@ class @Problem
     if not @check_save_waitfor(@check_internal)
       @check_internal()
 
+
+
+
+
+
+
+
+
+
+
   hint_button: =>
-    alert("03.3 hint_button")
+    alert("03.4 hint_button")
     Logger.log 'hint_button', 0
 
 
     inputElement = document.getElementsByClassName("hint_button")[0]
-#    for attribute in inputElement.attributes
-#      @$(
-#        if
-#
-#      )
-    next_hint_index = inputElement.attributes[3].nodeValue
+
+    for anAttribute in inputElement.attributes
+      if inputElement.attributes[_i].name == "next_hint_index"
+        next_hint_index = inputElement.attributes[_i].nodeValue
+        break
     alert("next_hine_index: " + next_hint_index)
 
 
@@ -317,6 +326,16 @@ class @Problem
     $.postWithPrefix "#{@url}/hint_button", id: @id, (response) =>
         @render(response.html)
         @updateProgress response
+
+
+
+
+
+
+
+
+
+
 
   check_internal: =>
     @enableCheckButton false
