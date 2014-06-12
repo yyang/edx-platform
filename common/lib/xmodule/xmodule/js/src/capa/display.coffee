@@ -31,6 +31,8 @@ class @Problem
     @checkButtonCheckText = @checkButton.val()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
+
+    @$('div.action input.hint_button').click @hint_button
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
@@ -289,8 +291,12 @@ class @Problem
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
+    alert("04 Problem.prototype.check")
     if not @check_save_waitfor(@check_internal)
       @check_internal()
+
+  hint_button: =>
+    alert("03 hint_button")
 
   check_internal: =>
     @enableCheckButton false
