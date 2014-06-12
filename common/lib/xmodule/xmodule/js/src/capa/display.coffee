@@ -296,7 +296,27 @@ class @Problem
       @check_internal()
 
   hint_button: =>
-    alert("03 hint_button")
+    alert("03.3 hint_button")
+    Logger.log 'hint_button', 0
+
+
+    inputElement = document.getElementsByClassName("hint_button")[0]
+#    for attribute in inputElement.attributes
+#      @$(
+#        if
+#
+#      )
+    next_hint_index = inputElement.attributes[3].nodeValue
+    alert("next_hine_index: " + next_hint_index)
+
+
+
+
+
+
+    $.postWithPrefix "#{@url}/hint_button", id: @id, (response) =>
+        @render(response.html)
+        @updateProgress response
 
   check_internal: =>
     @enableCheckButton false
