@@ -605,6 +605,24 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
+
+
+
+        self.problem_hints_count = len(self.lcp.tree.xpath("//problem/hints/hint"))
+        self.next_hint_index = 0
+        if isinstance(self.data, dict):
+            if self.data['next_hint_index']:
+                self.next_hint_index = self.data['next_hint_index']
+
+        self.show_hint_button = self.problem_hints_count > self.next_hint_index
+
+
+
+
+
+
+
+
         content = {
             'name': self.display_name_with_default,
             'html': html,
@@ -642,6 +660,10 @@ class CapaMixin(CapaFields):
             html = self.runtime.replace_jump_to_id_urls(html)
 
         return html
+
+    def hint_button(self, data):
+        self.next_hint_index = data['next_hint_index']
+        return self.get_problem_html()
 
     def is_past_due(self):
         """
