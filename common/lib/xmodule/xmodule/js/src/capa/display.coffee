@@ -306,7 +306,7 @@ class @Problem
 
 
   hint_button: =>
-    alert("03.4 hint_button")
+    alert("03.5 hint_button")
     Logger.log 'hint_button', 0
 
 
@@ -323,7 +323,7 @@ class @Problem
 
 
 
-    $.postWithPrefix "#{@url}/hint_button", id: @id, (response) =>
+    $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>
         @render(response.html)
         @updateProgress response
 

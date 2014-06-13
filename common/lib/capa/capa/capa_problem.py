@@ -53,6 +53,7 @@ html_problem_semantics = [
     "answer",
     "script",
     "hintgroup",
+    "hints",
     "openendedparam",
     "openendedrubric",
 ]

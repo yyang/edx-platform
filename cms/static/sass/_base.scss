@@ -913,3 +913,14 @@ body.hide-wip {
     display: none;
   }
 }
+
+span.correct-hint {
+   color: #34ae27;
+   border: 1px solid $gray-l4;
+}
+
+
+span.incorrect-hint {
+   color: red;
+   border: 1px solid $gray-l4;
+}

@@ -18,6 +18,7 @@ except ImportError:
     dog_stats_api = None
 
 from pkg_resources import resource_string
+from lxml import etree
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
@@ -579,6 +580,49 @@ class CapaMixin(CapaFields):
 
         return html
 
+    def insert_problem_hint(self):
+        '''
+        If the student has requested a program hint, find the next hint to display
+        for this problem and insert it into the display stream
+        :return: Nothing
+        '''
+        hint_elements_list = self.lcp.tree.xpath("//problem/hints/hint")
+        if hint_elements_list:
+            self.problem_hints_count = len(hint_elements_list)     # count the program hints
+        else:
+            self.problem_hints_count = 0
+
+        if hasattr(self, 'next_hint_index'):
+            if self.next_hint_index < self.problem_hints_count:
+                hint_element = self.lcp.tree.xpath("//problem/hints/hint")[ self.next_hint_index ]
+                hint_text = hint_element.text.strip()
+                print hint_text
+                self.next_hint_index += 1
+        else:
+            self.next_hint_index = 0
+
+        if self.next_hint_index < self.problem_hints_count:     # if there are more program hints to give
+            self.show_hint_button = True
+        else:
+            self.show_hint_button = False
+
+
+
+
+
+        #
+        # if hasattr(self, 'next_hint_index'):                    # if the student has requested a program hint
+        #     hint_element = self.lcp.tree.xpath("//problem/hints/hint")[self.next_hint_index]
+        #     hint_text = hint_element.text.strip()
+        #     print hint_text
+        #     self.next_hint_index += 1
+        # else:
+        #     self.next_hint_index = 0           # no hint was requested
+        #
+        # if self.problem_hints_count > self.next_hint_index:
+        #     self.show_hint_button = True
+
+
     def get_problem_html(self, encapsulate=True):
         """
         Return html for the problem.
@@ -605,16 +649,7 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
-
-
-
-        self.problem_hints_count = len(self.lcp.tree.xpath("//problem/hints/hint"))
-        self.next_hint_index = 0
-        if isinstance(self.data, dict):
-            if self.data['next_hint_index']:
-                self.next_hint_index = self.data['next_hint_index']
-
-        self.show_hint_button = self.problem_hints_count > self.next_hint_index
+        self.insert_problem_hint()          # if the student has requested a program hint, add it to correct_map
 
 
 
@@ -662,8 +697,13 @@ class CapaMixin(CapaFields):
         return html
 
     def hint_button(self, data):
-        self.next_hint_index = data['next_hint_index']
-        return self.get_problem_html()
+        self.next_hint_index = int(data['next_hint_index'])
+        html = self.get_problem_html(encapsulate=False)
+
+        return {
+            'success': True,
+            'contents': html
+        }
 
     def is_past_due(self):
         """
