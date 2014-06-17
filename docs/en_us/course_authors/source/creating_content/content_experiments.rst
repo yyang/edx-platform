@@ -79,11 +79,12 @@ To enable content experiments in your course, you add ``split_test`` to the
 Specify Group Configurations
 ****************************************
 
-Before you can create content experiments, you must define group configurations.
+Before you can create content experiments, you must specify group
+configurations.
 
-A group configuration defines how many groups of students are in
-an experiment. You can have any number of group configurations in your course.
-When you create a content experiment, you select the group configuration to use.
+A group configuration defines how many groups of students are in an experiment.
+You can have any number of group configurations in your course. When you create
+a content experiment, you select the group configuration to use.
 
 For example, you may want to do one content experiment that presents either a
 video or a reading assignment to your students, and another content experiment
@@ -267,13 +268,16 @@ Configure a Content Experiment in Studio
 After you `Enable Content Experiments`_ and `Specify Group
 Configurations`_, you can configure content experiments.
 
-You can add a content experiment in a unit or container page. In Studio, you create and view content for all groups in the content experiments in a container page for the experiment, as shown in `Create Content for Groups in the Content Experiment`_.
+You can add a content experiment in a unit or container page. In Studio, you
+create and view content for all groups in the content experiment in a container
+page for the experiment, as shown in `Create Content for Groups in the Content
+Experiment`_.
 
-When a student views the unit with the content experiment, she has no indication
-there is a content experiment in the unit, and the content experiment display
-name is not shown. She sees only the content that you configure for the group
-she is assigned to. To the student, the unit with the content experiment is no
-different than any other unit.
+When a student views the unit with the content experiment, she has no
+indication there is a content experiment in the unit, and the content
+experiment display name is not shown. She sees only the content that you
+configure for the group she is assigned to. To the student, the unit with the
+content experiment is no different than any other unit.
 
 
 To configure a content experiment in Studio, you:
@@ -312,23 +316,23 @@ Create the Content Experiment
 
 #. Click **Save**.
 
-The content experiment is displayed in a unit page as a component that contains
-other components. See :ref:`Components that Contain Other Components` for more
+The content experiment is displayed as a component that contains other
+components. See :ref:`Components that Contain Other Components` for more
 information.
 
 You can now create content for the groups in the experiment.
 
-================================================================
+=====================================================
 Create Content for Groups in the Content Experiment
-================================================================
+=====================================================
    
 After you select a group configuration, in the content experiment component
 click **View**.
 
 The content experiment page that opens automatically includes a container for
-each group that is defined in the group configuration you selected. For example,
-if you select a group configuration that defines Group A and Group B, you see
-the following page:
+each group that is defined in the group configuration you selected. For
+example, if you select a group configuration that defines Group A and Group B,
+you see the following page:
 
 .. image:: ../Images/content_experiment_container.png
  :alt: The content experiment page with two groups
@@ -347,6 +351,43 @@ For example, you can add an HTML component and a video to Group A:
   experiment.  For example, if one group has a video and another group has no
   content, you can analyze the effect of the video on student performance.
 
+
+================================
+Change the Group Configuration
+================================
+
+You can change the group configuration for a content experiment. When you
+change the group configuration, you must add components to the new groups. You
+can add the components in the previous groups, as well as create new
+components.
+
+.. warning::
+  Changing the group configuration of a student-visible experiment will impact
+  the experiment data.
+
+To change the group configuration:
+
+#. In a content experiment component, click **Edit**.
+
+   .. image:: ../Images/content_experiment_editor_group2.png
+    :alt: The content experiment editor with a group configuration selected
+
+#. Select a different group configuration.
+
+#. Click **Save**.
+
+#. You must now add components to the new groups in the experiment. Click
+   **View** to open the content experiment.
+
+   You see that groups for the new configuration are empty, and any components
+   that you had added to groups in the previous configuration are now moved to
+   a section called **Inactive Groups**.
+
+   .. image:: ../Images/inactive_groups.png
+    :alt: Components in inactive groups
+
+#. Drag and drop components from the Inactive Groups into the new groups as
+   needed. You can also create new components in the new groups.
 
 
 .. _Configure the Content Experiment in XML:
