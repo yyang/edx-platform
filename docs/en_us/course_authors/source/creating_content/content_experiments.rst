@@ -285,6 +285,8 @@ To configure a content experiment in Studio, you:
 #. `Create the content experiment`_.
 #. `Create content for groups in the content experiment`_.
    
+After you configure a content experiment, if necessary you can `Change the Group Configuration for a Content Experiment`_.
+   
 
 ===============================
 Create the Content Experiment
@@ -352,13 +354,13 @@ For example, you can add an HTML component and a video to Group A:
   content, you can analyze the effect of the video on student performance.
 
 
-================================
-Change the Group Configuration
-================================
+========================================================
+Change the Group Configuration for a Content Experiment
+========================================================
 
 You can change the group configuration for a content experiment. When you
 change the group configuration, you must add components to the new groups. You
-can add the components in the previous groups, as well as create new
+can use the components from the previous groups, as well as create new
 components.
 
 .. warning::
