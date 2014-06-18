@@ -229,7 +229,9 @@ def add_repo(repo, rdir_in, branch=None):
 
     # extract course ID from output of import-command-run and make symlink
     # this is needed in order for custom course scripts to work
+    log.warning("Got ret_import: %s", ret_import)
     match = re.search(r'(?ms)===> IMPORTING course (\S+)', ret_import)
+    log.warning("Got match: %s", match)
     if match:
         course_id = match.group(1)
         try:
