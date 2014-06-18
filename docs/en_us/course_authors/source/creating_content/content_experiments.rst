@@ -28,6 +28,10 @@ Also known as A/B or split tests, content experiments enable you to
 research and compare the performance of students in different groups to gain
 insight into the relative effectiveness of your course content.
 
+.. caution::
+  If you have graded problems within a content experiment, grade exports do not
+  work for your course. This issue is currently being addressed.
+
 .. _Courses with Multiple Content Experiments:
 
 ******************************************
