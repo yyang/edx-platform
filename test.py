@@ -1,4 +1,4 @@
 __author__ = 'minhtuevo'
 
 from django.conf import settings
-print settings.__sizeof__()
+print "size:", settings.__sizeof__()
