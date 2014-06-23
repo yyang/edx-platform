@@ -1,4 +1,6 @@
 __author__ = 'minhtuevo'
 
 from django.conf import settings
-print "size:", settings.__sizeof__()
+import os
+print "the size of settings:", settings.__sizeof__()
+os.system("/edx/app/edxapp/venvs/edxapp/bin/paver test_python")
