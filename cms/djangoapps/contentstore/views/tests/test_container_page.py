@@ -37,9 +37,9 @@ class ContainerPageTestCase(StudioPageTestCase):
                 'data-locator="{0}" data-course-key="{0.course_key}">'.format(self.child_container.location)
             ),
             expected_breadcrumbs=(
-                r'<a href="/course/{course}" class="navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
-                r'<span class="navigation-parent">\s*Lesson 1\s*</span>\s*'
-                r'<a href="/container/{unit}" class="navigation-link navigation-parent">\s*Unit\s*</a>'
+                r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
+                r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
+                r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>'
             ).format(
                 course=re.escape(unicode(self.course.id)),
                 unit=re.escape(unicode(self.vertical.location)),
@@ -68,10 +68,10 @@ class ContainerPageTestCase(StudioPageTestCase):
                     'data-locator="{0}" data-course-key="{0.course_key}">'.format(published_container.location)
                 ),
                 expected_breadcrumbs=(
-                    r'<a href="/course/{course}" class="navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
-                    r'<span class="navigation-parent">\s*Lesson 1\s*</span>\s*'
-                    r'<a href="/container/{unit}" class="navigation-link navigation-parent">\s*Unit\s*</a>\s*'
-                    r'<a href="/container/{split_test}" class="navigation-link navigation-parent">\s*Split Test\s*</a>'
+                    r'<a href="/course/{course}" class="navigation-item navigation-link navigation-parent">\s*Week 1\s*</a>\s*'
+                    r'<span class="navigation-item navigation-parent">\s*Lesson 1\s*</span>\s*'
+                    r'<a href="/container/{unit}" class="navigation-item navigation-link navigation-parent">\s*Unit\s*</a>\s*'
+                    r'<a href="/container/{split_test}" class="navigation-item navigation-link navigation-parent">\s*Split Test\s*</a>'
                 ).format(
                     course=re.escape(unicode(self.course.id)),
                     unit=re.escape(unicode(self.vertical.location)),

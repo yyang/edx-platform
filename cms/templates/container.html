@@ -69,11 +69,11 @@ main_xblock_info = {
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url}" class="navigation-link navigation-parent">
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">
                             ${ancestor.display_name_with_default | h}
                         </a>
                     % else:
-                        <span class="navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
                     % endif
                 % endfor
             </small>
@@ -119,32 +119,32 @@ main_xblock_info = {
                     </div>
                 % endif
                 % if is_unit_page:
-                    <div class="window unit-location">
+                    <div class="unit-location">
                         <h4 class="header">${_("Unit Location")}</h4>
-                        <div class="window-contents">
-                            <div class="row wrapper-unit-id">
-                                <p class="unit-id">
-                                    <label for="unit-location-id-input">${_("Unit Identifier:")}</label>
-                                    <input type="text" class="url value" id="unit-location-id-input" value="${unit.location.name}" readonly />
-                                </p>
-                            </div>
-                            <div class="unit-tree-location">
-                                <ol>
-                                    <li class="section">
-                                        <a href="${xblock_studio_url(section)}" class="section-item section-name">
-                                            <span class="section-name">${section.display_name_with_default}</span>
-                                        </a>
-                                        <ol>
-                                            <li class="subsection">
-                                                <div class="section-item">
-                                                    <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
-                                                </div>
-                                                ${units.enum_units(subsection, actions=False, selected=unit.location)}
-                                            </li>
-                                        </ol>
-                                    </li>
-                                </ol>
-                            </div>
+                        <div class="wrapper-unit-id content-bit">
+                            <h5 class="title">Unit Location ID</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID to link to this unit from other places in your course")}</span>
+                            </p>
+                        </div>
+                        <div class="wrapper-unit-tree-location content-bit">
+                            <h5 class="title">Unit Tree Location</h5>
+                            <ol>
+                                <li class="section">
+                                    <a href="${xblock_studio_url(section)}" class="section-item section-name">
+                                        <span class="section-name">${section.display_name_with_default}</span>
+                                    </a>
+                                    <ol>
+                                        <li class="subsection">
+                                            <div class="section-item">
+                                                <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                                            </div>
+                                            ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                                        </li>
+                                    </ol>
+                                </li>
+                            </ol>
                         </div>
                     </div>
                 % endif
