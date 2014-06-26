@@ -21,7 +21,7 @@ from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item, compute_publish_state, PublishState, get_modulestore
-from contentstore.views.helpers import get_parent_xblock, is_unit
+from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 
 from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
@@ -236,16 +236,6 @@ def get_component_templates(course):
         'video': _("Video")
     }
 
-    def get_component_display_name(component, default_display_name=None):
-        """
-        Returns the display name for the specified component.
-        """
-        component_class = _load_mixed_class(component)
-        if hasattr(component_class, 'display_name') and component_class.display_name.default:
-            return _(component_class.display_name.default)
-        else:
-            return default_display_name
-
     component_templates = []
     categories = set()
     # The component_templates array is in the order of "advanced" (if present), followed
@@ -256,7 +246,7 @@ def get_component_templates(course):
         # add the default template with localized display name
         # TODO: Once mixins are defined per-application, rather than per-runtime,
         # this should use a cms mixed-in class. (cpennington)
-        display_name = get_component_display_name(category, _('Blank'))
+        display_name = xblock_type_display_name(category, _('Blank'))
         templates_for_category.append(create_template_dict(display_name, category))
         categories.add(category)
 
@@ -279,7 +269,7 @@ def get_component_templates(course):
             for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
-                component_display_name = get_component_display_name(component)
+                component_display_name = xblock_type_display_name(component)
                 templates_for_category.append(create_template_dict(component_display_name, component, boilerplate_name))
                 categories.add(component)
 
@@ -301,7 +291,7 @@ def get_component_templates(course):
             if category in ADVANCED_COMPONENT_TYPES and not category in categories:
                 # boilerplates not supported for advanced components
                 try:
-                    component_display_name = get_component_display_name(category)
+                    component_display_name = xblock_type_display_name(category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
                             component_display_name,
