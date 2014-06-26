@@ -62,7 +62,7 @@ main_xblock_info = {
 
 <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-navigation has-subtitle">
-        <h1 class="page-header">
+        <div class="page-header">
             <small class="navigation navigation-parents subtitle">
                 % for ancestor in ancestor_xblocks:
                     <%
@@ -78,9 +78,9 @@ main_xblock_info = {
                 % endfor
             </small>
             <div class="wrapper-xblock-field is-editable" data-field="display_name">
-                <div class="page-header-title xblock-field-value">${xblock.display_name_with_default | h}</div>
+                <h1 class="page-header-title xblock-field-value">${xblock.display_name_with_default | h} <span class="sr">Edit</span></h1>
             </div>
-        </h1>
+        </div>
 
         <nav class="nav-actions">
             <h3 class="sr">${_("Page Actions")}</h3>

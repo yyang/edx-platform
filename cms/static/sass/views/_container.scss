@@ -13,10 +13,19 @@
     border-bottom: none;
     padding-bottom: 0;
 
-    .page-header {
+    .page-header-title {
       @extend %t-title;
       @include font-size(28);
       @include line-height(32);
+      font-weight: 600;
+    }
+
+    .page-header-title-edit {
+      @extend %t-title4;
+      background: none repeat scroll 0 0 white;
+      border: 0;
+      box-shadow: 0 0 2px 2px $shadow inset;
+      font-weight: 600;
     }
   }
 

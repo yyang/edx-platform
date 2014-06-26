@@ -2,14 +2,14 @@
 
     <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
         <header class="mast has-actions has-navigation">
-            <h1 class="page-header">
+            <div class="page-header">
                 <small class="navigation navigation-parents subtitle">
                     <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
                 </small>
                 <div class="wrapper-xblock-field is-editable" data-field="display_name">
-                    <div class="page-header-title xblock-field-value">Test Container</div>
+                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
                 </div>
-            </h1>
+            </div>
 
             <nav class="nav-actions">
                 <h3 class="sr">Page Actions</h3>
