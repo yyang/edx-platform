@@ -10,7 +10,8 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import CourseKey
 from .django import contentstore
 from PIL import Image
 
@@ -103,7 +104,7 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
