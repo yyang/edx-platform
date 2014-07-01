@@ -527,27 +527,26 @@ class LoncapaResponse(object):
                 student_answer_list = [student_answer_list]     # cast it as a true list
 
             for student_answer in student_answer_list:
-                hint_list = self.xml.xpath(group_name + '/choice [@name="' + str(student_answer) + '"] /hint')
-                if hint_list:
-                    hint = hint_list[0]
+                attribute_test = '[@name="' + student_answer + '"]'
+                choice = self.xml.xpath('//choice' + attribute_test)[0]
+                choice_correctness = choice.get("correct")
 
-                    if hint != None and hint.text != None and len(hint.text.strip()) > 0: # if there is a string to show
-                        if hint.get('label'):
-                            correctness_string = hint.get('label') + ': '
+                choicehint_list = self.xml.xpath('//choice' + attribute_test + '/choicehint')
+                for choice_hint in choicehint_list:
+                    choice_hint_text = choice_hint.text.strip()
+                    if len(choice_hint_text) > 0:
+                        choice_hint_label = choice_hint.get('label')
+                        if choice_hint_label:
+                            correctness_string = choice_hint_label + ': '
                         else:
-                            choice_list = self.xml.xpath(group_name + '/choice [@name="' + str(student_answer) + '"]')
-                            choice = choice_list[0]
-
                             correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-
                             if choice.get('correct') == 'True':
                                 correctness_string = 'CORRECT: '
 
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + hint.text.strip() + '</p>'
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + choice_hint_text + '</p>'
+
 
 #-----------------------------------------------------------------------------
-
-
 @registry.register
 class JavascriptResponse(LoncapaResponse):
     """
