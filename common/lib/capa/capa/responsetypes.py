@@ -262,8 +262,10 @@ class LoncapaResponse(object):
         using_new_style_hints = False  # assume we are not using new style hints
         xproblem_element = self.xml.getroottree().xpath('.')
         schema_version = xproblem_element[0].get('schema')
-        if schema_version and schema_version == '1.0':              # this is the right schema
+        if schema_version and schema_version == 'edXML/1.0':        # this is the right schema
             using_new_style_hints = True                            # turns out we are using new style hints
+        else:
+            print ">>>>>>>>> schema_version '" + schema_version + "' does not match expected version 'edXML/1.0'"
         return using_new_style_hints
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
@@ -1543,45 +1545,69 @@ class StringResponse(LoncapaResponse):
         :param new_cmap:        the 'correct map' to which applicable hints will be
                                 added for display by downstream code
         :param student_answers: the set of answer choices made by the student
-        :return:                nothing
+        :return:                True if a single choice hint was found
         '''
-        hint_text = ''
+        hint_found = False
         for problem in student_answers:
             student_answer = student_answers[problem]
 
-            for primary_answer in self.original_xml.xpath('//stringresponse'):          # check the primary answer first
-                if self.check_hint_condition_match(primary_answer.get('answer'), student_answer):
-                    for primary_hint in self.original_xml.xpath('//stringresponse/hint'):
+            # check the primary answer first
+            for primary_answer in self.original_xml.xpath('//stringresponse'):
+                if self._check_hint_condition_match(primary_answer.get('answer'), student_answer, self.regexp):
+                    hint_found = True
+                    for primary_hint in self.original_xml.xpath('//stringresponse/correcthint'):
                         new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + primary_hint.text.strip() + '</div>'
 
-            for additional_answer in self.original_xml.xpath('//additional_answer'):    # check all add'l answers
-                if self.check_hint_condition_match(additional_answer.text, student_answer):
-                    for additional_answer_hint in self.original_xml.xpath('//stringresponse/additional_answer/hint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
+            # check all additional answers
+            if not hint_found:
+                for additional_answer in self.original_xml.xpath('//additional_answer'):
+                    additional_answer_text = additional_answer.get("answer")
+                    if self._check_hint_condition_match(additional_answer_text, student_answer, self.regexp):
+                        hint_found = True
+                        for additional_answer_hint in self.original_xml.xpath('//stringresponse/additional_answer'):
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
 
-            for incorrect_answer in self.original_xml.xpath('//incorrect_answer'):      # check all incorrect answers
-                if self.check_hint_condition_match(incorrect_answer.text, student_answer):
-                    for incorrect_answer_hint in self.original_xml.xpath('//stringresponse/incorrect_answer/hint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+            # check all incorrect answers (regex not allowed)
+            if not hint_found:
+                for incorrect_answer in self.original_xml.xpath('//stringequalhint'):
+                    incorrect_answer_text = incorrect_answer.get("answer")
+                    if self._check_hint_condition_match(incorrect_answer_text, student_answer, False):
+                        hint_found = True
+                        for incorrect_answer_hint in self.original_xml.xpath('//stringequalhint'):
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
-    def check_hint_condition_match(self, regex, answer):
+            # check all incorrect answers (regex supplied)
+            if not hint_found:
+                for incorrect_answer in self.original_xml.xpath('//regexphint'):
+                    incorrect_answer_text = incorrect_answer.get("answer")
+                    if self._check_hint_condition_match(incorrect_answer_text, student_answer, True):
+                        hint_found = True
+                        attribute_test = '[@answer="' + incorrect_answer_text + '"]'
+                        for incorrect_answer_hint in self.original_xml.xpath('//regexphint' + attribute_test):
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+
+        return hint_found
+
+    def _check_hint_condition_match(self, pattern, answer, use_regex):
         '''
         Attempt to match a regular expression against the student answer. Return True if a match is made.
         :param regex:   regular expression to use in attempting the match
         :param answer:  student's answer string
         :return:        True if the expression matches
         '''
-        try:
-            flags = re.IGNORECASE if self.case_insensitive else 0
-            regexp = re.compile(regex.strip(), flags=flags | re.UNICODE)
-            return bool(re.search(regexp, answer.strip()))
-        except Exception as err:
-            msg = u'Illegal regex expression: ' + regex     # NOTE: this line needs internationalization
-            raise ResponseError(msg)
+        result = False
+        if use_regex:
+            try:
 
-
-
-
+                flags = re.IGNORECASE if self.case_insensitive else 0
+                regexp = re.compile(pattern.strip(), flags=flags | re.UNICODE)
+                result = bool(re.search(regexp, answer.strip()))
+            except Exception as err:
+                msg = u'Illegal regex expression: ' + pattern     # NOTE: this line needs internationalization
+                raise ResponseError(msg)
+        else:
+            result = unicode(answer.upper().strip()).__contains__(pattern.upper())
+        return result
 
     def check_string(self, expected, given):
         """
@@ -3410,4 +3436,12 @@ __all__ = [CodeResponse,
 #
 #     * no single item hints provided in the question
 #     * no compound hints provided in the question
+#
+#     * Jane's instructor request (see her email from 6/24)
+#       - student provides no answer (all blank)
+#
+#     * text input: what if both a correct and incorrect answer is provided?
+#       - with answer="France" and incorrect hint for "Germany"
+#       - student answer: France and Germany
+#       - what's the correct response from the system?
 #
