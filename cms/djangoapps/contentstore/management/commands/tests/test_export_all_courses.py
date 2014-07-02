@@ -40,7 +40,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         courses, failed_export_courses = export_courses_to_output_path(self.temp_dir)
         self.assertEqual(len(courses), 1)
         self.assertEqual(len(failed_export_courses), 1)
-        self.assertEqual(failed_export_courses[0], course_id.__unicode__())
+        self.assertEqual(failed_export_courses[0], unicode(course_id))
 
     def tearDown(self):
         """ Common cleanup. """

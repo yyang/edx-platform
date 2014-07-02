@@ -1,5 +1,5 @@
 """
-Script for exporting all courseware from Mongo to a directory and list the courses which failed to export
+Script for exporting all courseware from Mongo to a directory and listing the courses which failed to export
 """
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_exporter import export_to_xml
@@ -27,7 +27,9 @@ class Command(BaseCommand):
         print(u"=" * 30 + u"> Export summary")
         print(u"Total number of courses to export: {0}".format(len(courses)))
         print(u"Total number of courses which failed to export: {0}".format(len(failed_export_courses)))
-        print(u"List of export failed courses ids: {0}".format(failed_export_courses))
+        print(u"List of export failed courses ids:")
+        print(u"\n".join(failed_export_courses))
+        print("=" * 80)
 
 
 def export_courses_to_output_path(output_path):
@@ -39,21 +41,19 @@ def export_courses_to_output_path(output_path):
     root_dir = output_path
     courses = module_store.get_courses()
 
-    print("%d courses to export:" % len(courses))
     course_ids = [x.id for x in courses]
-    print(course_ids)
     failed_export_courses = []
 
     for course_id in course_ids:
-        print("-" * 77)
-        print("Exporting course id = {0} to {1}".format(course_id, output_path))
+        print(u"-" * 80)
+        print(u"Exporting course id = {0} to {1}".format(course_id, output_path))
         try:
             course_dir = course_id.to_deprecated_string().replace('/', '...')
             export_to_xml(module_store, content_store, course_id, root_dir, course_dir)
         except Exception as err:  # pylint: disable=broad-except
-            failed_export_courses.append(course_id.__unicode__())
-            print(u"=" * 30 + u"> Oops, failed to export %s" % course_id)
-            print("Error:")
+            failed_export_courses.append(unicode(course_id))
+            print(u"=" * 30 + u"> Oops, failed to export {0}".format(course_id))
+            print(u"Error:")
             print(err)
 
     return courses, failed_export_courses
