@@ -68,7 +68,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # deeper than initial descendant fetch or doesn't exist
             course_info = course_entry_override or self.course_entry
             course_key = CourseLocator(
-                course_info.get('org'), course_info.get('offering'), course_info.get('branch'),
+                course_info.get('org'), course_info.get('course'), course_info.get('run'), course_info.get('branch'),
                 course_info['structure']['_id']
             )
             self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
