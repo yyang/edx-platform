@@ -24,3 +24,8 @@ class MakoMiddleware(object):
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
         requestcontext['site'] = safe_get_host(request)
+
+    def process_response(self, request, response):
+        global requestcontext
+        requestcontext = None
+        return response
