@@ -586,7 +586,7 @@ class CapaMixin(CapaFields):
         for this problem and insert it into the display stream
         :return: Nothing
         '''
-        hint_elements_list = self.lcp.tree.xpath("//problem/hints/hint")
+        hint_elements_list = self.lcp.tree.xpath("//problem/demandhints/hint")
         if hint_elements_list:
             self.problem_hints_count = len(hint_elements_list)     # count the program hints
         else:
@@ -594,7 +594,7 @@ class CapaMixin(CapaFields):
 
         if hasattr(self, 'next_hint_index'):
             if self.next_hint_index < self.problem_hints_count:
-                hint_element = self.lcp.tree.xpath("//problem/hints/hint")[ self.next_hint_index ]
+                hint_element = self.lcp.tree.xpath("//problem/demandhints/hint")[ self.next_hint_index ]
                 hint_text = hint_element.text.strip()
                 print hint_text
                 self.next_hint_index += 1
