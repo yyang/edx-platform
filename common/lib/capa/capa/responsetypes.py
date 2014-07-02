@@ -521,7 +521,6 @@ class LoncapaResponse(object):
         :return:                nothing
         '''
         for problem in student_answers:
-
             student_answer_list = student_answers[problem]
             if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
                 student_answer_list = [student_answer_list]     # cast it as a true list
@@ -872,26 +871,31 @@ class ChoiceResponse(LoncapaResponse):
                 choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
                 if choice_list:             # if we found at least one choice element
                     choice = choice_list[0]
-                    selection_id_list.append(choice.get('id'))
+                    selection_id_list.append(choice.get('id').upper())
             selection_id_list.sort()        # sort the list to make comparison easier
 
-            condition_id_list = []      # create a list of all the required selection id's
-            compound_hints_list = self.xml.xpath('hints/hint')
-            for compound_hint_element in compound_hints_list:
-                for condition_element in compound_hint_element.xpath('response'):
-                    condition_id = condition_element.text.strip()
-                    condition_id_list.append(condition_id)
-                condition_id_list.sort()    # sort the list to make comparison easier
 
-            if condition_id_list == selection_id_list:
-                compound_hint_matched = True
 
-                hint_label = ''
-                if compound_hint_element.get('label'):
-                    hint_label = compound_hint_element.get('label') + ': '
+            for boolean_hint_element in self.xml.xpath("//booleanhint"):
+                boolean_condition_string = boolean_hint_element.get("value").upper()
+                boolean_condition_string = boolean_condition_string.replace("AND", " ")  # delete optional 'AND' operator
+                boolean_condition_string = boolean_condition_string.replace("*", " ")    # delete any '*' operator
 
-                new_cmap[problem]['msg'] = '<p>' + hint_label + compound_hint_element.text.strip() + '</p>'
-                break
+                boolean_condition_list = []
+                for boolean_conditon_token in boolean_condition_string.split(" "):
+                    if len(boolean_conditon_token.strip()) > 0:
+                        boolean_condition_list.append(boolean_conditon_token)
+                boolean_condition_list.sort()   # sort the list to make comparison easier
+
+                if boolean_condition_list == selection_id_list:
+                    compound_hint_matched = True
+
+                    hint_label = ''
+                    if boolean_hint_element.get('label'):
+                        hint_label = boolean_hint_element.get('label') + ': '
+
+                    new_cmap[problem]['msg'] = '<p>' + hint_label + boolean_hint_element.text.strip() + '</p>'
+                    break
 
         return compound_hint_matched
 
