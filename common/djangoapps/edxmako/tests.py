@@ -53,13 +53,11 @@ class MakoMiddlewareTest(TestCase):
     def setUp(self):
         self.middleware = edxmako.middleware.MakoMiddleware()
         self.user = UserFactory.create()
-        self.course_id = 'mock/course/id'
-        self.url = reverse("courseware", kwargs={'course_id': self.course_id})
+        self.url = "/"
         self.request = RequestFactory().get(self.url)
         self.request.user = self.user
         self.response = Mock(spec=HttpResponse)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_clear_request_context_variable(self):
         """
         Test clear requestcontext global variable.
