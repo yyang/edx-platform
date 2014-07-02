@@ -43,7 +43,7 @@ class ChecklistTestCase(CourseTestCase):
         response = self.client.get(self.checklists_url)
         self.assertContains(response, "Getting Started With Studio")
         # Verify expansion of action URL happened.
-        self.assertContains(response, 'course_team/slashes:mitX+333+Checklists_Course')
+        self.assertContains(response, 'course_team/mitX/333/Checklists_Course')
         # Verify persisted checklist does NOT have expanded URL.
         checklist_0 = self.get_persisted_checklists()[0]
         self.assertEqual('ManageUsers', get_action_url(checklist_0, 0))
