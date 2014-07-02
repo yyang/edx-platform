@@ -30,6 +30,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         """
         import_from_xml(
             self.module_store,
+            '**replace_user**',
             'common/test/data/',
             ['dot-underscore'],
             static_content_store=self.content_store,

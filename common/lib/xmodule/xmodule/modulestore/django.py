@@ -25,9 +25,6 @@ try:
 except ImportError:
     HAS_REQUEST_CACHE = False
 
-_MODULESTORES = {}
-
-FUNCTION_KEYS = ['render_template']
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"^.*~$")
 
 
