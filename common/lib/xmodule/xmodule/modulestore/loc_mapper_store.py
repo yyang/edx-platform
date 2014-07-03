@@ -11,6 +11,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class LocMapperStore(object):
@@ -88,7 +89,7 @@ class LocMapperStore(object):
             ValueError if one and only one of org and offering is provided. Provide either both or neither.
         """
         if org is None and offering is None:
-            assert(isinstance(course_key, SlashSeparatedCourseKey))
+            assert(isinstance(course_key, CourseKey))
             org = course_key.org
             offering = u"{0.course}.{0.run}".format(course_key)
         elif org is None or offering is None:
@@ -349,7 +350,7 @@ class LocMapperStore(object):
         """
         Construct the SON needed to repr the course_key for either a query or an insertion
         """
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         return bson.son.SON([
             ('org', course_key.org),
             ('course', course_key.course),
