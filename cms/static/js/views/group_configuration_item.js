@@ -2,7 +2,7 @@ define([
     'js/views/baseview', 'jquery', 'js/views/group_configuration_details',
     'js/views/group_configuration_edit'
 ], function(
-    BaseView, $, GroupConfigurationDetailsView, GroupConfigurationEditView
+    BaseView, $, GroupConfigurationDetails, GroupConfigurationEdit
 ) {
     'use strict';
     var GroupConfigurationsItem = BaseView.extend({
@@ -28,17 +28,17 @@ define([
 
         render: function() {
             // Removes a view from the DOM, and calls stopListening to remove
-            // any bound events that the view has listenTo'd.
+            // any bound events that the view has listened to.
             if (this.view) {
                 this.view.remove();
             }
 
             if (this.model.get('editing')) {
-                this.view = new GroupConfigurationEditView({
+                this.view = new GroupConfigurationEdit({
                     model: this.model
                 });
             } else {
-                this.view = new GroupConfigurationDetailsView({
+                this.view = new GroupConfigurationDetails({
                     model: this.model
                 });
             }

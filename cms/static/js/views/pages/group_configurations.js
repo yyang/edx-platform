@@ -2,12 +2,12 @@ define([
     'jquery', 'underscore', 'gettext', 'js/views/baseview',
     'js/views/group_configurations_list'
 ],
-function ($, _, gettext, BaseView, ConfigurationsListView) {
+function ($, _, gettext, BaseView, GroupConfigurationsList) {
     'use strict';
     var GroupConfigurationsPage = BaseView.extend({
         initialize: function() {
             BaseView.prototype.initialize.call(this);
-            this.listView = new ConfigurationsListView({
+            this.listView = new GroupConfigurationsList({
                 collection: this.collection
             });
         },

@@ -20,14 +20,16 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-require(["!domReady", "js/collections/group_configuration", "js/views/pages/group_configurations"],
-function(doc, GroupConfigurationCollection, GroupConfigurationsPage, xmoduleLoader) {
+require(["domReady!", "js/collections/group_configuration", "js/views/pages/group_configurations"],
+function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
   % if configurations is not None:
-    var view = new GroupConfigurationsPage({
+    var collection = new GroupConfigurationCollection(${json.dumps(configurations)});
+
+    collection.url = "${group_configuration_url}";
+    new GroupConfigurationsPage({
         el: $('#content'),
-        collection: new GroupConfigurationCollection(${json.dumps(configurations)}, { url: "${group_configuration_url}" })
-    });
-    view.render();
+        collection: collection
+    }).render();
   % endif
 });
 </script>

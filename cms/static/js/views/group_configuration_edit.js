@@ -1,8 +1,7 @@
 define([
-    'js/views/baseview', 'underscore', 'jquery',
-    'js/views/feedback_notification'
+    'js/views/baseview', 'underscore', 'jquery', 'gettext'
 ],
-function(BaseView, _, $, NotificationView) {
+function(BaseView, _, $, gettext) {
     'use strict';
     var GroupConfigurationEdit = BaseView.extend({
         tagName: 'div',
@@ -74,19 +73,22 @@ function(BaseView, _, $, NotificationView) {
                 return false;
             }
 
-            var saving = new NotificationView.Mini({
-                title: gettext('Saving') + '&hellip;'
-            }).show();
+            this.runOperationShowingMessage(
+                gettext('Saving') + '&hellip;',
+                function () {
+                    var dfd = $.Deferred();
 
-            this.model.save({}, {
-                success: function() {
-                    this.model.setOriginalAttributes();
-                    this.close();
-                }.bind(this),
-                complete: function() {
-                    saving.hide();
-                }
-            });
+                    this.model.save({}, {
+                        success: function() {
+                            this.model.setOriginalAttributes();
+                            this.close();
+                            dfd.resolve();
+                        }.bind(this)
+                    });
+
+                    return dfd;
+                }.bind(this)
+            );
         },
 
         cancel: function(event) {

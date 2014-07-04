@@ -896,7 +896,7 @@ class GroupConfiguration(object):
         """
         if not group_configuration.get("name"):
             raise GroupConfigurationsValidationError("must have name of the configuration")
-        if not group_configuration.get("description"):
+        if not isinstance(group_configuration.get("description"), basestring):
             raise GroupConfigurationsValidationError("must have description of the configuration")
         if len(group_configuration.get('groups')) < 2:
             raise GroupConfigurationsValidationError("must have at least two groups")

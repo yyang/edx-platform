@@ -1,16 +1,31 @@
 define([
-    'js/models/group_configuration', 'js/models/course',
+    'js/models/course', 'js/models/group_configuration',
     'js/collections/group_configuration',
     'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
     'js/views/group_configuration_item', 'js/views/feedback_notification',
-    'js/spec_helpers/create_sinon', 'jasmine-stealth'
+    'js/spec_helpers/create_sinon', 'js/spec_helpers/edit_helpers',
+    'jasmine-stealth'
 ], function(
-    GroupConfigurationModel, Course, GroupConfigurationSet,
+    Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
-    GroupConfigurationItem, Notification, create_sinon
+    GroupConfigurationItem, Notification, create_sinon, view_helpers
 ) {
     'use strict';
+    var SELECTORS = {
+        detailsView: '.view-group-configuration-details',
+        editView: '.view-group-configuration-edit',
+        itemView: '.group-configurations-list-item',
+        group: '.group',
+        name: '.group-configuration-name',
+        description: '.group-configuration-description',
+        groupsCount: '.group-configuration-groups-count',
+        groupsAllocation: '.group-allocation',
+        errorMessage: '.group-configuration-edit-error',
+        inputName: '.group-configuration-name-input',
+        inputDescription: '.group-configuration-description-input'
+    };
+
     beforeEach(function() {
         window.course = new Course({
             id: '5',
@@ -30,6 +45,20 @@ define([
                 } else {
                     return trimmedText.indexOf(text) !== -1;
                 }
+            },
+            toBeCorrectValuesInInputs: function (values) {
+                var expected = {
+                    name: this.actual.$(SELECTORS.inputName).val(),
+                    description: this.actual
+                        .$(SELECTORS.inputDescription).val()
+                };
+
+                return _.isEqual(values, expected);
+            },
+            toBeCorrectValuesInModel: function (values) {
+                return _.every(values, function (value, key) {
+                    return this.actual.get(key) === value;
+                }.bind(this));
             }
         });
     });
@@ -39,13 +68,8 @@ define([
     });
 
     describe('GroupConfigurationDetails', function() {
-        var tpl = readFixtures('group-configuration-details.underscore');
-
         beforeEach(function() {
-            setFixtures($('<script>', {
-                id: 'group-configuration-details-tpl',
-                type: 'text/template'
-            }).text(tpl));
+            view_helpers.installTemplate('group-configuration-details', true);
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -53,65 +77,59 @@ define([
                 id: 0
             });
 
-            spyOn(this.model, 'destroy').andCallThrough();
-            this.collection = new GroupConfigurationSet([ this.model ]);
+            this.collection = new GroupConfigurationCollection([ this.model ]);
             this.view = new GroupConfigurationDetails({
                 model: this.model
             });
+            appendSetFixtures(this.view.render().el);
         });
 
-        describe('Basic', function() {
-            it('should render properly', function() {
-                this.view.render();
+        it('should render properly', function() {
+            expect(this.view.$el).toContainText('Configuration');
+            expect(this.view.$el).toContainText('ID: 0');
+        });
 
-                expect(this.view.$el).toContainText('Configuration');
-                expect(this.view.$el).toContainText('ID: 0');
-            });
+        it('should show groups appropriately', function() {
+            this.model.get('groups').add([{}, {}, {}]);
+            this.model.set('showGroups', false);
+            this.view.$('.show-groups').click();
 
-            it('should show groups appropriately', function() {
-                this.model.get('groups').add([{}, {}, {}]);
-                this.model.set('showGroups', false);
-                this.view.render().$('.show-groups').click();
+            expect(this.model.get('showGroups')).toBeTruthy();
+            expect(this.view.$(SELECTORS.group).length).toBe(3);
+            expect(this.view.$(SELECTORS.groupsCount)).not.toExist();
+            expect(this.view.$(SELECTORS.description))
+                .toContainText('Configuration Description');
+            expect(this.view.$(SELECTORS.groupsAllocation))
+                .toContainText('33%');
+        });
 
-                expect(this.model.get('showGroups')).toBeTruthy();
-                expect(this.view.$('.group').length).toBe(3);
-                expect(this.view.$('.group-configuration-groups-count'))
-                    .not.toExist();
-                expect(this.view.$('.group-configuration-description'))
-                    .toContainText('Configuration Description');
-                expect(this.view.$('.group-allocation'))
-                    .toContainText('33%');
-            });
+        it('should hide groups appropriately', function() {
+            this.model.get('groups').add([{}, {}, {}]);
+            this.model.set('showGroups', true);
+            this.view.$('.hide-groups').click();
 
-            it('should hide groups appropriately', function() {
-                this.model.get('groups').add([{}, {}, {}]);
-                this.model.set('showGroups', true);
-                this.view.render().$('.hide-groups').click();
-
-                expect(this.model.get('showGroups')).toBeFalsy();
-                expect(this.view.$('.group').length).toBe(0);
-                expect(this.view.$('.group-configuration-groups-count'))
-                    .toContainText('Contains 3 groups');
-                expect(this.view.$('.group-configuration-description'))
-                    .not.toExist();
-                expect(this.view.$('.group-allocation'))
-                    .not.toExist();
-            });
+            expect(this.model.get('showGroups')).toBeFalsy();
+            expect(this.view.$(SELECTORS.group)).not.toExist();
+            expect(this.view.$(SELECTORS.groupsCount))
+                .toContainText('Contains 3 groups');
+            expect(this.view.$(SELECTORS.description)).not.toExist();
+            expect(this.view.$(SELECTORS.groupsAllocation)).not.toExist();
         });
     });
 
     describe('GroupConfigurationEdit', function() {
-        var tpl = readFixtures('group-configuration-edit.underscore');
+
+        var setValuesToInputs = function (view, values) {
+            _.each(values, function (value, selector) {
+                if (SELECTORS[selector]) {
+                    view.$(SELECTORS[selector]).val(value);
+                }
+            });
+        };
 
         beforeEach(function() {
-            setFixtures($('<script>', {
-                id: 'group-configuration-edit-tpl',
-                type: 'text/template'
-            }).text(tpl));
-
-            appendSetFixtures(sandbox({
-                id: 'page-notification'
-            }));
+            view_helpers.installViewTemplates();
+            view_helpers.installTemplate('group-configuration-edit');
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -119,238 +137,171 @@ define([
                 id: 0,
                 editing: true
             });
-            this.collection = new GroupConfigurationSet([this.model], {
-                url: '/group_configurations'
-            });
+            this.collection = new GroupConfigurationCollection([this.model]);
+            this.collection.url = '/group_configurations';
             this.view = new GroupConfigurationEdit({
                 model: this.model
             });
-            spyOn(this.view, 'render').andCallThrough();
+            appendSetFixtures(this.view.render().el);
         });
 
-        describe('Basic', function() {
-            beforeEach(function () {
-                spyOn(this.model, 'save');
-            });
-
-            it('should render properly', function() {
-                this.view.render();
-                expect(this.view.$('.group-configuration-name-input').val())
-                    .toBe('Configuration');
-                expect(
-                    this.view.$('.group-configuration-description-input').val()
-                ).toBe('Configuration Description');
-            });
-
-            it('should save properly', function() {
-                this.view.render();
-                this.view.$('.group-configuration-name-input').val(
-                    'New Configuration'
-                );
-                this.view.$('.group-configuration-description-input').val(
-                    'New Description'
-                );
-                this.view.$('form').submit();
-
-                expect(this.model.get('name')).toBe('New Configuration');
-                expect(this.model.get('description')).toBe('New Description');
-
-                expect(this.model.save).toHaveBeenCalled();
-            });
-
-            it('should not save on invalid', function() {
-                this.view.render();
-                this.view.$('.group-configuration-name-input').val('');
-                this.view.$('form').submit();
-                expect(this.model.validationError).toBeTruthy();
-                expect(this.model.save).not.toHaveBeenCalled();
-            });
-
-            it('does not save on cancel', function() {
-                this.view.render();
-                this.view.$('.group-configuration-name-input').val(
-                    'New Configuration'
-                );
-                this.view.$('.group-configuration-description-input').val(
-                    'New Description'
-                );
-                this.view.$('.action-cancel').click();
-                expect(this.model.get('name')).toBe('Configuration');
-                expect(this.model.get('description')).toBe(
-                    'Configuration Description'
-                );
-                expect(this.model.save).not.toHaveBeenCalled();
-            });
-
-            it('should be removed if it is a new item', function() {
-                spyOn(this.model, 'isNew').andReturn(true);
-                this.view.render();
-                this.view.$('.group-configuration-name-input').val(
-                    'New Configuration'
-                );
-                this.view.$('.group-configuration-description-input').val(
-                    'New Description'
-                );
-                this.view.$('.action-cancel').click();
-                expect($('.group-configurations-list-item').length).toBe(0);
-                expect(this.model.save).not.toHaveBeenCalled();
-            });
-
-            it('should be possible to correct validation errors', function() {
-                this.view.render();
-                this.view.$('.group-configuration-name-input').val('');
-                this.view.$('form').submit();
-                expect(this.model.validationError).toBeTruthy();
-                expect(this.model.save).not.toHaveBeenCalled();
-                this.view.$('.group-configuration-name-input').val(
-                    'New Configuration'
-                );
-                this.view.$('form').submit();
-                expect(this.model.validationError).toBeFalsy();
-                expect(this.model.save).toHaveBeenCalled();
-            });
-
-            var message = 'should have appropriate class names on focus/blur';
-            it(message, function () {
-                this.view.render();
-                var element = this.view.$('.group-configuration-name-input'),
-                    parent = this.view.$('.add-group-configuration-name');
-
-                element.focus();
-                expect(parent).toHaveClass('is-focused');
-                element.blur();
-                expect(parent).not.toHaveClass('is-focused');
+        it('should render properly', function() {
+            expect(this.view).toBeCorrectValuesInInputs({
+                name: 'Configuration',
+                description: 'Configuration Description'
             });
         });
 
-        describe('AJAX', function() {
-            beforeEach(function() {
-                this.savingSpies = spyOnConstructor(Notification, 'Mini', [
-                    'show', 'hide'
-                ]);
-                this.savingSpies.show.andReturn(this.savingSpies);
+        it('should save properly', function() {
+            var requests = create_sinon.requests(this),
+                notificationSpy = view_helpers.createNotificationSpy();
+
+            setValuesToInputs(this.view, {
+                inputName: 'New Configuration',
+                inputDescription: 'New Description'
             });
 
-            it('should save itself and close editing view', function() {
-                var requests = create_sinon.requests(this),
-                    savingOptions;
+            this.view.$('form').submit();
+            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            requests[0].respond(200);
+            view_helpers.verifyNotificationHidden(notificationSpy);
 
-                this.model.set('name', 'New Configuration Name');
-                this.view.render().$('form').submit();
-
-                // Saving massage should be shown
-                expect(this.savingSpies.constructor).toHaveBeenCalled();
-                expect(this.savingSpies.show).toHaveBeenCalled();
-                expect(this.savingSpies.hide).not.toHaveBeenCalled();
-                savingOptions = this.savingSpies.constructor.mostRecentCall
-                                                                    .args[0];
-                expect(savingOptions.title).toMatch(/Saving/);
-                requests[0].respond(200);
-                expect(this.savingSpies.hide).toHaveBeenCalled();
-                // Close edit form on success save
-                expect($('.edit-group-configuration').length).toBe(0);
-                expect(this.model.get('editing')).toBeFalsy();
-                expect(this.model.get('name')).toBe('New Configuration Name');
+            expect(this.model).toBeCorrectValuesInModel({
+                name: 'New Configuration',
+                description: 'New Description'
             });
+            expect(this.view.$el).not.toExist();
+        });
+
+        it('does not hide saving message if failure', function() {
+            var requests = create_sinon.requests(this),
+                notificationSpy = view_helpers.createNotificationSpy();
+
+            setValuesToInputs(this.view, { inputName: 'New Configuration' });
+            this.view.$('form').submit();
+            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            create_sinon.respondWithError(requests);
+            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+        });
+
+        it('does not save on cancel', function() {
+            setValuesToInputs(this.view, {
+                inputName: 'New Configuration',
+                inputDescription: 'New Description'
+            });
+            this.view.$('.action-cancel').click();
+            expect(this.model).toBeCorrectValuesInModel({
+                name: 'Configuration',
+                description: 'Configuration Description'
+            });
+            // Model is still exist in the collection
+            expect(this.collection.indexOf(this.model)).toBeGreaterThan(-1);
+            expect(this.collection.length).toBe(1);
+        });
+
+        it('should be removed on cancel if it is a new item', function() {
+            spyOn(this.model, 'isNew').andReturn(true);
+            setValuesToInputs(this.view, {
+                inputName: 'New Configuration',
+                inputDescription: 'New Description'
+            });
+            this.view.$('.action-cancel').click();
+            // Model is removed from the collection
+            expect(this.collection.length).toBe(0);
+        });
+
+        it('should be possible to correct validation errors', function() {
+            var requests = create_sinon.requests(this);
+
+            // Set incorrect value
+            setValuesToInputs(this.view, { inputName: '' });
+            // Try to save
+            this.view.$('form').submit();
+            // See error message
+            expect(this.view.$(SELECTORS.errorMessage)).toContainText(
+                'Group Configuration name is required'
+            );
+            // No request
+            expect(requests.length).toBe(0);
+            // Set correct value
+            setValuesToInputs(this.view, { inputName: 'New Configuration' });
+            // Try to save
+            this.view.$('form').submit();
+            requests[0].respond(200);
+            // Model is updated
+            expect(this.model).toBeCorrectValuesInModel({
+                name: 'New Configuration'
+            });
+            // Error message disappear
+            expect(this.view.$(SELECTORS.errorMessage)).not.toExist();
+            expect(requests.length).toBe(1);
+        });
+
+        it('should have appropriate class names on focus/blur', function () {
+            var element = this.view.$(SELECTORS.inputName),
+                parent = this.view.$('.add-group-configuration-name');
+
+            element.focus();
+            expect(parent).toHaveClass('is-focused');
+            element.blur();
+            expect(parent).not.toHaveClass('is-focused');
         });
     });
 
     describe('GroupConfigurationsList', function() {
-        var noGroupConfigurationsTpl = readFixtures(
-            'no-group-configurations.underscore'
-        );
-
         beforeEach(function() {
-            setFixtures($('<script>', {
-                id: 'no-group-configurations-tpl',
-                type: 'text/template'
-            }).text(noGroupConfigurationsTpl));
+            view_helpers.installTemplate('no-group-configurations', true);
 
-            this.collection = new GroupConfigurationSet();
+            this.collection = new GroupConfigurationCollection();
             this.view = new GroupConfigurationsList({
                 collection: this.collection
             });
-            this.view.render();
+            appendSetFixtures(this.view.render().el);
         });
 
-        var message = 'should render the empty template if there are no ' +
-                      'group configurations';
-        it(message, function() {
-            expect(this.view.$el).toContainText(
-                'You haven\'t created any group configurations yet.'
-            );
-            expect(this.view.$el).toContain('.new-button');
-            expect(
-                this.view.$('.group-configurations-list-item').length
-            ).toBe(0);
-        });
+        describe('empty template', function () {
+            it('should be rendered if no group configurations', function() {
+                expect(this.view.$el).toContainText(
+                    'You haven\'t created any group configurations yet.'
+                );
+                expect(this.view.$el).toContain('.new-button');
+                expect(this.view.$(SELECTORS.itemView)).not.toExist();
+            });
 
-        message = 'the empty template should disappear when new ' +
-                      'group configuration is added';
-        it(message, function() {
-            var emptyMessage = 'You haven\'t created any group ' +
-                'configurations yet.';
+            it('should disappear if group configuration is added', function() {
+                var emptyMessage = 'You haven\'t created any group ' +
+                    'configurations yet.';
 
-            expect(this.view.$el).toContainText(emptyMessage);
-            expect(
-                this.view.$('.group-configurations-list-item').length
-            ).toBe(0);
-            this.collection.add([{}]);
-            expect(this.view.$el).not.toContainText(emptyMessage);
-            expect(
-                this.view.$('.group-configurations-list-item').length
-            ).toBe(1);
-        });
-
-        message = 'should render GroupConfigurationDetails views by default';
-        it(message, function() {
-            this.collection.add([{}, {}, {}]);
-            this.view.render();
-
-            expect(this.view.$el).not.toContainText(
-                'You haven\'t created any group configurations yet.'
-            );
-            expect(this.view.$('.group-configuration').length).toBe(3);
+                expect(this.view.$el).toContainText(emptyMessage);
+                expect(this.view.$(SELECTORS.itemView)).not.toExist();
+                this.collection.add([{}]);
+                expect(this.view.$el).not.toContainText(emptyMessage);
+                expect(this.view.$(SELECTORS.itemView)).toExist();
+            });
         });
     });
 
     describe('GroupConfigurationItem', function() {
-        var groupConfigurationEditTpl = readFixtures(
-            'group-configuration-edit.underscore'
-        ), message;
-
         beforeEach(function() {
-            setFixtures($('<script>', {
-                id: 'group-configuration-edit-tpl',
-                type: 'text/template'
-            }).text(groupConfigurationEditTpl));
-            this.model = new GroupConfigurationModel({});
-            this.collection = new GroupConfigurationSet([ this.model ]);
+            this.model = new GroupConfigurationModel({ });
+            this.collection = new GroupConfigurationCollection([ this.model ]);
             this.view = new GroupConfigurationItem({
                 model: this.model
             });
-            this.view.render();
+            appendSetFixtures(this.view.render().el);
         });
 
-        message = 'should render GroupConfigurationDetails view by default';
-        it(message, function() {
-            expect(
-                this.view.$('.view-group-configuration-details').length
-            ).toBe(1);
-        });
-
-        message = 'previous view should be replaced correctly';
-        it(message, function() {
-            expect(
-                this.view.$('.view-group-configuration-details').length
-            ).toBe(1);
+        it('should render properly', function() {
+            // Details view by default
+            expect(this.view.$(SELECTORS.detailsView)).toExist();
             this.model.set('editing', true);
-            expect(
-                this.view.$('.view-group-configuration-edit').length
-            ).toBe(1);
-            expect(
-                this.view.$('.view-group-configuration-details').length
-            ).toBe(0);
+            expect(this.view.$(SELECTORS.editView)).toExist();
+            expect(this.view.$(SELECTORS.detailsView)).not.toExist();
+            this.model.set('editing', false);
+            expect(this.view.$(SELECTORS.detailsView)).toExist();
+            expect(this.view.$(SELECTORS.editView)).not.toExist();
         });
     });
 });
+
+
