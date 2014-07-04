@@ -9,7 +9,7 @@
     </header>
 
     <ol class="group-configuration-info group-configuration-info-<% if(showGroups){ print('block'); } else { print('inline'); } %>">
-      <% if (_.isNumber(id)) { %>
+      <% if (!_.isUndefined(id)) { %>
         <li class="group-configuration-id"
             ><span class="group-configuration-label"><%= gettext('ID') %>: </span
             ><span class="group-configuration-value"><%= id %></span
