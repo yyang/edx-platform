@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
+import uuid
 
 from django.utils.translation import ugettext as _
 import django.utils
@@ -13,7 +14,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
@@ -880,6 +881,7 @@ class GroupConfiguration(object):
         if not group_configuration.get('version'):
             group_configuration['version'] = UserPartition.VERSION
 
+        # this is temporary logic, we are going to build default groups on front-end
         if not group_configuration.get('groups'):
             group_configuration['groups'] = [
                 {'name': 'Group A'}, {'name': 'Group B'},
@@ -900,16 +902,6 @@ class GroupConfiguration(object):
             raise GroupConfigurationsValidationError(_("must have description of the configuration"))
         if len(group_configuration.get('groups')) < 2:
             raise GroupConfigurationsValidationError(_("must have at least two groups"))
-        group_id = unicode(group_configuration.get("id", ""))
-        if group_id and not group_id.isdigit():
-            raise GroupConfigurationsValidationError(_("group configuration ID must be numeric"))
-
-    @staticmethod
-    def generate_id(used_ids):
-        """
-        Return next ID that will be assigned to a group configuration.
-        """
-        return max(used_ids) + 1 if used_ids else 1
 
 
 @require_http_methods(("GET", "POST"))
@@ -928,7 +920,7 @@ def group_configurations_list_handler(request, course_key_string):
     course = _get_course_module(course_key, request.user)
     store = modulestore()
 
-    if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
         split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
 
@@ -937,8 +929,7 @@ def group_configurations_list_handler(request, course_key_string):
             'group_configuration_url': group_configuration_url,
             'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
         })
-
-    if request.method == 'POST':
+    elif "application/json" in request.META.get('HTTP_ACCEPT') and request.method == 'POST':
         # create a new group configuration for the course
         try:
             configuration = GroupConfiguration.parse(request.body)
@@ -947,8 +938,7 @@ def group_configurations_list_handler(request, course_key_string):
             return JsonResponse({"error": err.message}, status=400)
 
         if not configuration.get("id"):
-            used_ids = set([p.id for p in course.user_partitions])
-            configuration["id"] = GroupConfiguration.generate_id(used_ids)
+            configuration["id"] = unicode(uuid.uuid1())
 
         # Assign ids to every group in configuration.
         for index, group in enumerate(configuration.get('groups', [])):
@@ -964,6 +954,8 @@ def group_configurations_list_handler(request, course_key_string):
             kwargs={'group_configuration_id': configuration["id"]}
         )
         return response
+    else:
+        return HttpResponse(status=406)
 
 
 @require_http_methods(("GET", "POST"))
