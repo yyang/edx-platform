@@ -68,7 +68,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups")):
 
     def __new__(cls, id, name, description, groups):
         # pylint: disable=super-on-old-class
-        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups)
+        return super(UserPartition, cls).__new__(cls, id, name, description, groups)
 
     def to_json(self):
         """
