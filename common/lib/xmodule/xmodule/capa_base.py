@@ -206,6 +206,8 @@ class CapaMixin(CapaFields):
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
 
+    show_hint_button = False
+
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
@@ -227,7 +229,10 @@ class CapaMixin(CapaFields):
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
+
+
             self.lcp = self.new_lcp(self.get_state_for_lcp())
+            #self.lcp = kwargs['descriptor'].lcp
 
             # At this point, we need to persist the randomization seed
             # so that when the problem is re-loaded (to check/view/save)
@@ -580,11 +585,11 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def insert_problem_hint(self):
+    def tally_problem_hints(self):
         '''
-        If the student has requested a program hint, find the next hint to display
-        for this problem and insert it into the display stream
-        :return: Nothing
+        Count the number of problem attributes specified in the problem XML, saving
+        that value in self.problem_hints_counts
+        :return: Number of problem hints found
         '''
         hint_elements_list = self.lcp.tree.xpath("//problem/demandhints/hint")
         if hint_elements_list:
@@ -592,36 +597,33 @@ class CapaMixin(CapaFields):
         else:
             self.problem_hints_count = 0
 
-        if hasattr(self, 'next_hint_index'):
-            if self.next_hint_index < self.problem_hints_count:
-                hint_element = self.lcp.tree.xpath("//problem/demandhints/hint")[ self.next_hint_index ]
-                hint_text = hint_element.text.strip()
-                print hint_text
-                self.next_hint_index += 1
+        self.show_hint_button = False
+        if hasattr(self,'next_hint_index'):
+            if self.next_hint_index < self.problem_hints_count:     # if there are more program hints to give
+                self.show_hint_button = True
         else:
-            self.next_hint_index = 0
-
-        if self.next_hint_index < self.problem_hints_count:     # if there are more program hints to give
-            self.show_hint_button = True
-        else:
-            self.show_hint_button = False
+            self.show_hint_button = (self.problem_hints_count > 0)
 
 
+        self.problem_hints_count
 
+    def insert_problem_hint(self, html):
+        '''
+        If the student has requested a program hint, find the next hint to display
+        for this problem and insert it into the html stream
+        :return: A potentially modified html string
+        '''
+        if self.tally_problem_hints:
+            if hasattr(self, 'next_hint_index'):
+                if self.next_hint_index < self.problem_hints_count:
+                    hint_element = self.lcp.tree.xpath("//problem/demandhints/hint")[ self.next_hint_index ]
+                    hint_text = hint_element.text.strip()
+                    html = html.replace('> <', '>' + hint_text + '<')  # replace the single space (see correctmap.py)
+                    self.next_hint_index += 1
+            else:
+                self.next_hint_index = 0
 
-
-        #
-        # if hasattr(self, 'next_hint_index'):                    # if the student has requested a program hint
-        #     hint_element = self.lcp.tree.xpath("//problem/hints/hint")[self.next_hint_index]
-        #     hint_text = hint_element.text.strip()
-        #     print hint_text
-        #     self.next_hint_index += 1
-        # else:
-        #     self.next_hint_index = 0           # no hint was requested
-        #
-        # if self.problem_hints_count > self.next_hint_index:
-        #     self.show_hint_button = True
-
+        return html
 
     def get_problem_html(self, encapsulate=True):
         """
@@ -631,6 +633,7 @@ class CapaMixin(CapaFields):
         """
 
         try:
+            self.tally_problem_hints()
             html = self.lcp.get_html()
 
         # If we cannot construct the problem HTML,
@@ -649,15 +652,6 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
-        self.insert_problem_hint()          # if the student has requested a program hint, add it to correct_map
-
-
-
-
-
-
-
-
         content = {
             'name': self.display_name_with_default,
             'html': html,
@@ -674,7 +668,7 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'show_hint_button':self.show_hint_button,
+            'show_hint_button': self.show_hint_button,
             'next_hint_index':self.next_hint_index,
         }
 
@@ -693,6 +687,8 @@ class CapaMixin(CapaFields):
 
         if self.runtime.replace_jump_to_id_urls:
             html = self.runtime.replace_jump_to_id_urls(html)
+
+        html = self.insert_problem_hint(html)  # if the student has requested a program hint, add it to the html
 
         return html
 
