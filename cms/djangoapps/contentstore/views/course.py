@@ -875,7 +875,7 @@ class GroupConfiguration(object):
         try:
             group_configuration = json.loads(configuration_json)
         except ValueError:
-            raise GroupConfigurationsValidationError("invalid JSON")
+            raise GroupConfigurationsValidationError(_("invalid JSON"))
 
         if not group_configuration.get('version'):
             group_configuration['version'] = UserPartition.VERSION
@@ -895,14 +895,14 @@ class GroupConfiguration(object):
         Validate group configuration representation.
         """
         if not group_configuration.get("name"):
-            raise GroupConfigurationsValidationError("must have name of the configuration")
+            raise GroupConfigurationsValidationError(_("must have name of the configuration"))
         if not isinstance(group_configuration.get("description"), basestring):
-            raise GroupConfigurationsValidationError("must have description of the configuration")
+            raise GroupConfigurationsValidationError(_("must have description of the configuration"))
         if len(group_configuration.get('groups')) < 2:
-            raise GroupConfigurationsValidationError("must have at least two groups")
+            raise GroupConfigurationsValidationError(_("must have at least two groups"))
         group_id = unicode(group_configuration.get("id", ""))
         if group_id and not group_id.isdigit():
-            raise GroupConfigurationsValidationError("group configuration ID must be numeric")
+            raise GroupConfigurationsValidationError(_("group configuration ID must be numeric"))
 
     @staticmethod
     def generate_id(used_ids):
