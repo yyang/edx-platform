@@ -291,7 +291,6 @@ class @Problem
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
-    alert("04 Problem.prototype.check")
     if not @check_save_waitfor(@check_internal)
       @check_internal()
 
@@ -306,7 +305,6 @@ class @Problem
 
 
   hint_button: =>
-    alert("03.5 hint_button")
     Logger.log 'hint_button', 0
 
 
@@ -316,7 +314,6 @@ class @Problem
       if inputElement.attributes[_i].name == "next_hint_index"
         next_hint_index = inputElement.attributes[_i].nodeValue
         break
-    alert("next_hine_index: " + next_hint_index)
 
 
 
@@ -324,9 +321,7 @@ class @Problem
 
 
     $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>
-        @render(response.html)
-        @updateProgress response
-
+        @render(response.contents)
 
 
 
