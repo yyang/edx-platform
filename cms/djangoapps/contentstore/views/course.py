@@ -930,12 +930,12 @@ def group_configurations_list_handler(request, course_key_string):
 
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
-        splite_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
 
         return render_to_response('group_configurations.html', {
             'context_course': course,
             'group_configuration_url': group_configuration_url,
-            'configurations': [u.to_json() for u in course.user_partitions] if splite_test_enabled else None,
+            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
         })
 
     if request.method == 'POST':
