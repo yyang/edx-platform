@@ -254,46 +254,44 @@ class LoncapaResponse(object):
         return new_cmap
 
     def _using_new_style_hints(self):
-        '''
+        """
         Examine the problem's XML tree to determine whether the "new style" hint mechanism is in use.
 
         Return True if it is in use.
-        '''
+        """
         using_new_style_hints = False  # assume we are not using new style hints
         xproblem_element = self.xml.getroottree().xpath('.')
         schema_version = xproblem_element[0].get('schema')
         if schema_version and schema_version == 'edXML/1.0':        # this is the right schema
             using_new_style_hints = True                            # turns out we are using new style hints
-        else:
-            print ">>>>>>>>> schema_version '" + schema_version + "' does not match expected version 'edXML/1.0'"
         return using_new_style_hints
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
-        '''
+        """
         Check for any compound condition hints for the current question. If any are found
         and the selection matches the criteria specified, modify 'new_cmap'
         appropriately so that the hint material can be rendered further downstream.
 
         Return True if any match was found
-        '''
+        """
         return False
 
     def get_single_choice_hints(self, new_cmap, student_answers):
-        '''
+        """
         Check for any single item hints for the current question. If any are found
         and the selection matches the criteria specified, modify 'new_cmap'
         appropriately so that the hint material can be rendered further downstream.
-        '''
+        """
         pass
 
     def get_xml_hints(self, student_answers, new_cmap):
-        '''
+        """
         Look to the XML for any hinting which might be need to be displayed to the student.
         If any hint material is discovered 'new_cmap' is modified accordingly for display
         further downstream.
 
         Return True if new style hints were found
-        '''
+        """
         new_style_hints_found = False
         if len(student_answers) > 0:                        # if the student has supplied at least one selection
             if self._using_new_style_hints():               # if we are using new style hints
@@ -443,13 +441,13 @@ class LoncapaResponse(object):
         pass
 
     def _extract_problem_hints(self):
-        '''
+        """
         Find any problem hints (as distinct from question hints which provide a form
         of 'targeted feedback') in the XML for the problem. If any are found,
         create a list of them for later use then remove the XML elements to keep
         them from being displayed to student (via the XML, that is).
         :return: Nothing
-        '''
+        """
         problem_hint_list = []
         problem_element = self.xml.getparent()
         for hint_element in problem_element.findall('hints/hint'):
@@ -851,10 +849,10 @@ class ChoiceResponse(LoncapaResponse):
         return answers
 
     def get_single_choice_hints(self, new_cmap, student_answers):
-        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'checkboxgroup')
+        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choice')
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
-        '''
+        """
         Check the XML for any compund condition hints which should be delivered to the student based
         on the answer choices made.
 
@@ -862,7 +860,7 @@ class ChoiceResponse(LoncapaResponse):
                                 added for display by downstream code
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
-        '''
+        """
         compound_hint_matched = False       # assume we won't find any matching rules
 
         for problem in student_answers:
@@ -1211,7 +1209,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         return (solution_id, subset_choices)
 
     def get_single_choice_hints(self, new_cmap, student_answers):
-        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choicegroup')
+        return self.get_single_choice_hints_choice_response(new_cmap, student_answers, 'choice')
 
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
@@ -1273,6 +1271,44 @@ class OptionResponse(LoncapaResponse):
             'correct'), self.context)) for af in self.answer_fields])
         # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
+
+    def get_single_choice_hints(self, new_cmap, student_answers):
+        """
+        Check the XML for any hints which should be delivered to the student based
+        on the answer choices made.
+
+        :param new_cmap:        the 'correct map' to which applicable hints will be
+                                added for display by downstream code
+        :param student_answers: the set of answer choices made by the student
+        :return:                nothing
+        """
+        choice_name = 'option'
+        if not hasattr(self, 'hint_tag'):
+            raise Exception("Class '" + str(self.__class__) + "' has no 'hint_tag' attribute")
+
+        for problem in student_answers:
+            student_answer_list = student_answers[problem]
+            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
+                student_answer_list = [student_answer_list]     # cast it as a true list
+
+            for student_answer in student_answer_list:
+                for choice_hint_element in self.xml.xpath('//' + self.hint_tag):
+                    choice_element = choice_hint_element.getparent()
+                    clean_choice_string = choice_element.text.strip()
+                    if student_answer == clean_choice_string:   # if we have found the student's choice
+                        choice_hint_text = choice_hint_element.text.strip()
+                        if len(choice_hint_text) > 0:
+                            choice_hint_label = choice_hint_element.get('label')
+                            if choice_hint_label:
+                                correctness_string = choice_hint_label + ': '
+                            else:
+                                correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+                                if choice_element.get('correct') == 'True':
+                                    correctness_string = 'CORRECT: '
+
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + \
+                                correctness_string + choice_hint_text + '</p>'
+
 
 #-----------------------------------------------------------------------------
 
@@ -1541,7 +1577,7 @@ class StringResponse(LoncapaResponse):
 
 
     def get_single_choice_hints(self, new_cmap, student_answers):
-        '''
+        """
         Check the XML for any hints which should be delivered to the student based
         on the answer choices made.
 
@@ -1549,7 +1585,7 @@ class StringResponse(LoncapaResponse):
                                 added for display by downstream code
         :param student_answers: the set of answer choices made by the student
         :return:                True if a single choice hint was found
-        '''
+        """
         hint_found = False
         for problem in student_answers:
             student_answer = student_answers[problem]
@@ -1592,12 +1628,12 @@ class StringResponse(LoncapaResponse):
         return hint_found
 
     def _check_hint_condition_match(self, pattern, answer, use_regex):
-        '''
+        """
         Attempt to match a regular expression against the student answer. Return True if a match is made.
         :param regex:   regular expression to use in attempting the match
         :param answer:  student's answer string
         :return:        True if the expression matches
-        '''
+        """
         result = False
         if use_regex:
             try:
