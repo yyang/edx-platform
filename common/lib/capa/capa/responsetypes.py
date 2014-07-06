@@ -1482,8 +1482,54 @@ class NumericalResponse(LoncapaResponse):
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
 
-#-----------------------------------------------------------------------------
+    def _get_hint_label(self, hint_element, is_correct):
+        hint_label = hint_element.get('label')
+        if hint_label:
+            correctness_string = hint_label + ': '
+        else:
+            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+            if is_correct:
+                correctness_string = 'CORRECT: '
+        return correctness_string
 
+    def get_single_choice_hints(self, new_cmap, student_answers):
+        """
+        Check the XML for any hints which should be delivered to the student based
+        on the answer choices made.
+
+        :param new_cmap:        the 'correct map' to which applicable hints will be
+                                added for display by downstream code
+        :param student_answers: the set of answer choices made by the student
+        :return:                True if a single choice hint was found
+        """
+        hint_found = False
+        for problem in student_answers:
+            student_answer_string = student_answers[problem]
+            student_float = float(student_answer_string )
+
+            if new_cmap.cmap[problem]['correctness'] == 'correct':  # if the grader liked the student's answer
+                for correct_hint in self.original_xml.xpath('//numericalresponse/correcthint'):
+                    correctness_string = self._get_hint_label(correct_hint, True)
+                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">' + correctness_string + correct_hint.text.strip() + '</div>'
+                    hint_found = True
+            else:                                                   # else the grader counted student's answer wrong
+                for numerichint_element in self.xml.xpath('//numericalresponse/numerichint'):
+                    self._test_answer_for_hint(new_cmap, numerichint_element, problem, student_float)
+
+    def _test_answer_for_hint(self, new_cmap, numerichint_element, problem, student_float):
+        if 'tolerance' in numerichint_element.attrib:
+            tolerance_string = numerichint_element.attrib['tolerance']
+        else:
+            tolerance_string = '0'
+        answer_string = numerichint_element.attrib['answer']
+        if compare_with_tolerance(student_float, float(answer_string), float(tolerance_string)):
+            new_cmap.cmap[problem]['correctness'] = 'correct'  # is this a safe thing to do here?
+            correctness_string = self._get_hint_label(numerichint_element, True)
+            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">' \
+                + correctness_string + numerichint_element.text.strip() + '</div>'
+            hint_found = True
+
+#-----------------------------------------------------------------------------
 
 @registry.register
 class StringResponse(LoncapaResponse):
@@ -1569,12 +1615,6 @@ class StringResponse(LoncapaResponse):
         if self.case_insensitive:
             return given.lower() in [i.lower() for i in expected]
         return given in expected
-
-
-
-
-
-
 
     def get_single_choice_hints(self, new_cmap, student_answers):
         """
