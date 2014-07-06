@@ -59,6 +59,9 @@ registry = TagRegistry()
 CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
 CORRECTMAP_PY = None
 
+QUESTION_HINT_CORRECT_STYLE = 'question_hint_correct'
+QUESTION_HINT_INCORRECT_STYLE = 'question_hint_incorrect'
+QUESTION_HINT_COMPOUND_STYLE = 'question_hint_compound_condiiton'
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -136,6 +139,7 @@ class LoncapaResponse(object):
     max_inputfields = None
     allowed_inputfields = []
     required_attributes = []
+    
 
     def __init__(self, xml, inputfields, context, system):
         """
@@ -533,6 +537,11 @@ class LoncapaResponse(object):
                     choice_hint_text = choice_hint.text.strip()
                     if len(choice_hint_text) > 0:
                         choice_hint_label = choice_hint.get('label')
+
+                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                        if choice.get('correct'):
+                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
+
                         if choice_hint_label:
                             correctness_string = choice_hint_label + ': '
                         else:
@@ -540,8 +549,9 @@ class LoncapaResponse(object):
                             if choice.get('correct') == 'True':
                                 correctness_string = 'CORRECT: '
 
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + correctness_string + choice_hint_text + '</p>'
-
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
+                            '<div class="' + message_style_class + '">' \
+                            + correctness_string + choice_hint_text + '</div>'
 
 #-----------------------------------------------------------------------------
 @registry.register
@@ -872,8 +882,6 @@ class ChoiceResponse(LoncapaResponse):
                     selection_id_list.append(choice.get('id').upper())
             selection_id_list.sort()        # sort the list to make comparison easier
 
-
-
             for boolean_hint_element in self.xml.xpath("//booleanhint"):
                 boolean_condition_string = boolean_hint_element.get("value").upper()
                 boolean_condition_string = boolean_condition_string.replace("AND", " ")  # delete optional 'AND' operator
@@ -892,7 +900,9 @@ class ChoiceResponse(LoncapaResponse):
                     if boolean_hint_element.get('label'):
                         hint_label = boolean_hint_element.get('label') + ': '
 
-                    new_cmap[problem]['msg'] = '<p>' + hint_label + boolean_hint_element.text.strip() + '</p>'
+                    new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_COMPOUND_STYLE + '">' \
+                        + hint_label + boolean_hint_element.text.strip() + '</div>'
+
                     break
 
         return compound_hint_matched
@@ -1306,8 +1316,10 @@ class OptionResponse(LoncapaResponse):
                                 if choice_element.get('correct') == 'True':
                                     correctness_string = 'CORRECT: '
 
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<p>' + \
-                                correctness_string + choice_hint_text + '</p>'
+                            new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' \
+                                + correctness_string + choice_hint_text.text.strip() + '</div>'
+
+
 
 
 #-----------------------------------------------------------------------------
@@ -1510,24 +1522,32 @@ class NumericalResponse(LoncapaResponse):
             if new_cmap.cmap[problem]['correctness'] == 'correct':  # if the grader liked the student's answer
                 for correct_hint in self.original_xml.xpath('//numericalresponse/correcthint'):
                     correctness_string = self._get_hint_label(correct_hint, True)
-                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">' + correctness_string + correct_hint.text.strip() + '</div>'
+                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' + correctness_string + correct_hint.text.strip() + '</div>'
                     hint_found = True
             else:                                                   # else the grader counted student's answer wrong
                 for numerichint_element in self.xml.xpath('//numericalresponse/numerichint'):
-                    self._test_answer_for_hint(new_cmap, numerichint_element, problem, student_float)
+                    hint_found = self._test_answer_for_hint(new_cmap, numerichint_element, problem, student_float)
 
-    def _test_answer_for_hint(self, new_cmap, numerichint_element, problem, student_float):
-        if 'tolerance' in numerichint_element.attrib:
-            tolerance_string = numerichint_element.attrib['tolerance']
+    def _test_answer_for_hint(self, new_cmap, hint_element, problem, student_float):
+        """
+        Calculate whether a student's answer is within tolerance of the expected answer. If it is,
+        add the related hint text to the hint message string held in 'new_cmap' for presentation to
+        the student.
+
+        :return: True if a question hint was found which matched.
+        """
+        hint_found = False
+        if 'tolerance' in hint_element.attrib:
+            tolerance_string = hint_element.attrib['tolerance']
         else:
             tolerance_string = '0'
-        answer_string = numerichint_element.attrib['answer']
+        answer_string = hint_element.attrib['answer']
         if compare_with_tolerance(student_float, float(answer_string), float(tolerance_string)):
-            new_cmap.cmap[problem]['correctness'] = 'correct'  # is this a safe thing to do here?
-            correctness_string = self._get_hint_label(numerichint_element, True)
-            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">' \
-                + correctness_string + numerichint_element.text.strip() + '</div>'
+            correctness_string = self._get_hint_label(hint_element, True)
+            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_INCORRECT_STYLE + '">' \
+                + correctness_string + hint_element.text.strip() + '</div>'
             hint_found = True
+        return hint_found
 
 #-----------------------------------------------------------------------------
 
@@ -1635,7 +1655,7 @@ class StringResponse(LoncapaResponse):
                 if self._check_hint_condition_match(primary_answer.get('answer'), student_answer, self.regexp):
                     hint_found = True
                     for primary_hint in self.original_xml.xpath('//stringresponse/correcthint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + primary_hint.text.strip() + '</div>'
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">CORRECT: ' + primary_hint.text.strip() + '</div>'
 
             # check all additional answers
             if not hint_found:
@@ -1644,7 +1664,7 @@ class StringResponse(LoncapaResponse):
                     if self._check_hint_condition_match(additional_answer_text, student_answer, self.regexp):
                         hint_found = True
                         for additional_answer_hint in self.original_xml.xpath('//stringresponse/additional_answer'):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="detailed-targeted-feedback-correct">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
 
             # check all incorrect answers (regex not allowed)
             if not hint_found:
@@ -1653,7 +1673,7 @@ class StringResponse(LoncapaResponse):
                     if self._check_hint_condition_match(incorrect_answer_text, student_answer, False):
                         hint_found = True
                         for incorrect_answer_hint in self.original_xml.xpath('//stringequalhint'):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_INCORRECT_STYLE + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
             # check all incorrect answers (regex supplied)
             if not hint_found:
@@ -1663,7 +1683,7 @@ class StringResponse(LoncapaResponse):
                         hint_found = True
                         attribute_test = '[@answer="' + incorrect_answer_text + '"]'
                         for incorrect_answer_hint in self.original_xml.xpath('//regexphint' + attribute_test):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="incorrect">INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_INCORRECT_STYLE + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
         return hint_found
 
