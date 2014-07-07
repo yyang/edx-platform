@@ -4,7 +4,7 @@
 Discussions
 ############################
 
-Discussions, or discussion forums, foster interaction among your students and between students and course staff. You set up discussion topics and categories when you create your course, and then run and moderate discussions throughout the course to guide participation and develop course community. 
+Discussions, or discussion forums, foster interaction among your students and between students and course staff. You can set up different topics and categories to guide these interactions when you create your course, and then run and moderate discussions throughout the course to encourage participation and develop course community. 
 
 Discussions are also excellent sources of feedback and ideas for the future.
 
@@ -26,12 +26,13 @@ For options you can use to run and moderate discussions, see the following secti
 Overview
 ********************************
 
-Every edX course includes at least one discussion, which students and staff can use to share ideas, exchange views, and consider different viewpoints. In a discussion, there are three hierarchical levels of interaction. 
+Students and staff use course discussions to share ideas, exchange views, and
+consider different viewpoints. In a discussion, there are three hierarchical
+levels of interaction.
 
-* A *post* is the first level of interaction: a post opens a new subject, or
-  *thread*. Posts are often questions: either leading questions that are
-  intended to start discussions, or questions that surface an issue that a
-  student needs help to resolve.
+* A *post* is the first level of interaction: a post opens a new subject. Posts
+  are often posed as questions, either to start a conversation or to surface an
+  issue that requires some action.
 
 * A *response* is the second level of interaction: a reply made directly to the
   post to provide a solution or opinion, or to continue the conversational
@@ -40,6 +41,8 @@ Every edX course includes at least one discussion, which students and staff can 
 * A *comment* is the third level of interaction: a clarification or side note
   made to a specific reponse, rather than to the post as a whole.
  
+Together, a post, its responses, and the comments on those repsonses are called *thread*. 
+
 All course staff members and enrolled students can add posts, reponses, and
 comments, and view all of the posts, responses, and comments made by the
 others. Discussion threads are saved as part of the course.
@@ -70,7 +73,7 @@ To create a discussion category:
 
 #. Open your course in Studio. 
 
-#. Select **Settings** > **Advanced Settings**.
+#. Select **Settings**, then **Advanced Settings**.
 
 #. Scroll down to the **Discussion Topic Mapping** policy key. By default, its value is:
 
@@ -105,43 +108,46 @@ Assign Discussion Administration Roles
 ==========================================
 
 You can designate a team of people to help you run course discussions.
-Different options for working with discussions are available through
-these roles:
-
-* Discussion moderators can edit and delete messages, review messages flagged
-  for misuse, close and reopen threads, pin posts and endorse responses, and,
-  if the course is cohorted, see posts from all cohorts. Posts made by
-  moderators are marked as "By: Staff" in the Discussion list. Responses and
-  comments made by moderators have a colored "Staff" banner.
-
-* Discussion community TAs have the same options for working with discussions
-  as moderators. Posts made by community TAs are marked as "By: Community TA"
-  in the Discussion list. Responses and comments made by community TAs have a
-  colored "Community TA" banner.
-
-* Discussion admins have the same options for working with discussions as
-  moderators. Admins can also assign these discussion management roles to more
-  people while your course is running, or remove a role from a user whenever
-  necessary. Posts made by admins are marked as "By: Staff" in the Discussion
-  list. Responses and comments made by admins have a colored "Staff" banner.
 
 .. note:: 
   Course staff and instructors that you set up in Studio are not automatically
-  granted discussion administration roles. You must explicitly grant discussion
-  administration roles to course staff and instructors if they intend to
-  moderate or administer course discussions.
+  granted discussion administration roles. The course author or an instructor
+  must explicitly grant discussion administration roles to other members of the
+  course team for them to moderate or administer course discussions.
+
+Different options for working with discussions are available through
+these roles:
+
+* Discussion moderators can edit and delete messages at any level, review
+  messages flagged for misuse, close and reopen posts, pin posts and endorse
+  responses, and, if the course is cohorted, see posts from all cohorts. Posts
+  made by moderators are marked as "By: Staff" in the list of posts. Responses
+  and comments made by moderators have a colored "Staff" banner. This role is
+  often given to course team members who already have the Course Staff role
+
+* Discussion community TAs have the same options for working with discussions
+  as moderators. Posts made by community TAs are marked as "By: Community TA"
+  in the list of posts. Responses and comments made by community TAs have a
+  colored "Community TA" banner. This role is often given to students.
+
+* Discussion admins have the same options for working with discussions as
+  moderators, and their posts, responses, and comments have the same "Staff"
+  identifier. This role can be reserved for assignment to course team
+  members who have the Instructor role only: the discussion admins can then both moderate discussions and give other users these discussion management roles whenever necessary.
 
 Before you can assign roles to your discussion team, you need their email
 addresses or usernames.
 
-* To get this information for a staff member, on the Instructor Dashboard click **Membership** and then select **Course Staff** from the drop-down list.
+* To get this information for a course team member, on the Instructor Dashboard
+  click **Membership** and then select **Course Staff** or **Instructor** from
+  the drop-down list.
 
 * To get this information for any enrolled student, on the Instructor Dashboard
-  click **Data Download** > **Download profile information as a CSV**.
+  click **Data Download**, then **Download profile information as a CSV**.
 
-To assign a role:
+To assign a role, you must be the course author or an instructor.
 
-#. View the live version of your course.
+#. View the live version of the course.
 
 #. Click **Instructor**, then click **Membership**.
 
@@ -168,14 +174,13 @@ Seed a Discussion
 
 Before you contribute to a discussion, you can decide whether you want to be identified as a staff member or community TA, or to appear like other students' work. Depending on the subject and your purpose, one or the other might be more appropriate to spark discussion and inform students.
 
-You can also post anonymously. Regardless of your role, you can choose to make a post anonymous. However, you may want to discourage your students from posting anonymously, and therefore choose not to use this option yourself.
-.. reviewers, I think this is somewhat misleading as it relies on a Studio
-.. setting. Possibly a separate discussion on choosing and enabling the two
-.. different "anonymous" policy keys might be in order. I'll need to check with
-.. Lou about documenting either of these keys, however.
+.. You can also post anonymously. Regardless of your role, you can choose to
+.. make a post anonymous. However, you may want to discourage your students
+.. from posting anonymously, and therefore choose not to use this option
+.. yourself.
 
 * To identify your contributions with your role, log in with your discussion
-  administrator email address. The Discussion list shows "By: Staff" or "By:
+  administrator email address. The list of posts shows "By: Staff" or "By:
   Community TA" for your posts, and your responses and comments include a
   colored banner with "Staff" or "Community TA".
  
@@ -215,13 +220,13 @@ Minimize Thread Proliferation
 To encourage longer, threaded discussions rather than many similar, separate
 posts, the discussion team can use these techniques. However, be aware that
 long threads (with more than 200 responses and comments) can be difficult to
-read and slow to display, and can therefore result in an unsatisfactory
-experience in the discussion.
+read, and can therefore result in an unsatisfactory experience in the
+discussion.
 
-* Pin a post. Pinning a post makes it appear at the top of the Discussion list,
-  regardless of how a student sorts the list. As a result, it is more likely
-  that students will see and respond to pinned posts. You can write your own
-  post and then pin it, or pin a post by any author. Click **Pin Thread**.
+* Pin a post. Pinning a post makes it appear at the top of the list of posts.
+  As a result, it is more likely that students will see and respond to pinned
+  posts. You can write your own post and then pin it, or pin a post by any
+  author. Click **Pin Thread**.
 
     .. image:: ../Images/Pin_Discussion.png
      :alt: Image of the pin icon for discussion posts
@@ -237,8 +242,10 @@ experience in the discussion.
   further interaction by closing the post. Click the **Close** button that
   displays below the post to close it.
 
-* Provide post/response/comment guidelines.
-  A set of :ref:`Guidance for Discussion Moderators` or a post in the **General** discussion can provide guidance about when to create a new thread, respond to an existing post, or comment on a response. 
+* Provide post/response/comment guidelines. A set of :ref:`Guidance for
+  Discussion Moderators` or a post in a course-wide discussion category (such
+  as **General**) can provide guidance about when to start a new thread by
+  adding a post, respond to an existing post, or comment on a response.
 
 
 .. _Moderating_discussions:
@@ -286,7 +293,7 @@ Monitors can cultivate qualities in their own discussion interactions to make th
 
 * Provide timely responses. More time needs to be scheduled for answering discussion questions when deadlines for homework, quizzes, and other milestones approach.
 
-* Discourage redundancy: before responding to a post, search for similar posts. Make your response in the most pertinent or active thread, then copy its URL and use it to respond to the redundant threads.
+* Discourage redundancy: before responding to a post, search for similar posts. Make your response to the most pertinent or active post and then copy its URL and use it to respond to the redundant threads.
 
 * Publicize issues raised in the discussions: add questions and their answers to an FAQ discussion category, or announce them on the Course Info page. 
 
@@ -296,7 +303,7 @@ For a template that you can use to develop guidelines for your course moderators
 Edit Messages 
 ==================
 
-Discussion moderators, community TAs, and admins can edit the content of posts, responses, and comments. Posts that include spoilers or solutions, or that contain inappropriate or off-topic material, should be edited quickly to remove text, images, or links. 
+Discussion moderators, community TAs, and admins can edit the content of posts, responses, and comments. Messages that include spoilers or solutions, or that contain inappropriate or off-topic material, should be edited quickly to remove text, images, or links. 
 
 #. Log in to the course with your discussion administrator username.
 
@@ -408,7 +415,7 @@ To define when discussions are closed to new contributions and when they reopen:
 
 #. Open your course in Studio. 
 
-#. Select **Settings** > **Advanced Settings**.
+#. Select **Settings**, then **Advanced Settings**.
 
 #. Scroll down to the **Discussion Blackout Dates** policy key. 
 
