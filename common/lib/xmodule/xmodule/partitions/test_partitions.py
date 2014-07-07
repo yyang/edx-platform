@@ -94,7 +94,7 @@ class TestUserPartition(TestCase):
     def test_string_id(self):
         groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
         user_partition = UserPartition("70", 'Test Partition', 'for testing purposes', groups)
-        self.assertEqual(user_partition.id, 70)
+        self.assertEqual(user_partition.id, "70")
 
     def test_to_json(self):
         groups = [Group(0, 'Group 1'), Group(1, 'Group 2')]
