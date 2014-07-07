@@ -1,9 +1,8 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 <%! from django.utils.translation import ugettext as _ %>
 
-${_("Thank you for signing up for {platform_name}! To activate "
-"your account, please copy and paste this address into your web "
-"browser's address bar:").format(platform_name=settings.PLATFORM_NAME)}
+
+${_("Thank you for signing up for {platform_name}. To get started, please activate your account by clicking on the link below (you may also copy and paste the link into your browser's address bar).").format(platform_name=settings.PLATFORM_NAME)}
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -17,9 +16,25 @@ ${_("Thank you for signing up for {platform_name}! To activate "
       "receive any more email from us. Please do not reply to this e-mail; "
       "if you require assistance, check the about section of the "
       "{platform_name} Courses web site.").format(platform_name=settings.PLATFORM_NAME)}
+% else if settings.PLATFORM_NAME == "edX":
+${_("Please make sure you activate your account today. Activation will"
+      " ensure that you can register for edX courses and access the courseware."
+      " If you require assistance, please use our web help form:"
+      " https://www.edx.org/contact-us or contact us by emailing"
+      " info@edx.org. Please do not reply to this email.")}
+
+${_("Once you have activated your account, we encourage you to take the"
+      " edX DEMO101 course, which you can add from your dashboard, to"
+      " learn more about the edX learning environment and the student experience.")}
+
+${_("We hope you enjoy learning with edX!")}
+
+${_("Your edX team")}
+
 % else:
   ${_("If you didn't request this, you don't need to do anything; you won't "
       "receive any more email from us. Please do not reply to this e-mail; "
       "if you require assistance, check the help section of the "
       "{platform_name} web site.").format(platform_name=settings.PLATFORM_NAME)}
+
 % endif
