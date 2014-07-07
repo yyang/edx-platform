@@ -72,10 +72,10 @@ To create a discussion category:
 
 #. Select **Settings** > **Advanced Settings**.
 
-#. Scroll down to the **Policy Key** for **discussion_topics**. By default, its **Policy Value** is:
+#. Scroll down to the **Discussion Topic Mapping** policy key. By default, its value is:
 
  .. image:: ../Images/Discussion_Add_initial.png
-  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}}
+  :alt: Policy value of {"General": {"id": "i4x-edX-Open_DemoX-course-edx_demo_course"}}
 
 4. Copy the three lines provided for the General discussion category and paste them above the closing brace:
 
@@ -93,7 +93,7 @@ To create a discussion category:
 
 8. Click **Save Changes**.
 
-When students click the **Discussion** page for your course, the drop-down list includes this new category.
+When students click the **Discussion** page for your course, the drop-down Discussion list now includes this new category.
 
  .. image:: ../Images/NewCategory_Discussion.png
   :alt: Image of a new category named Course Q&A in the list of discussions
@@ -410,15 +410,14 @@ To define when discussions are closed to new contributions and when they reopen:
 
 #. Select **Settings** > **Advanced Settings**.
 
-#. Scroll down to the **Policy Key** for **discussion_blackouts**. 
+#. Scroll down to the **Discussion Blackout Dates** policy key. 
 
-#. In the **Policy Value** field, place your cursor between the supplied square
+#. In the field for the value, place your cursor between the supplied square
    brackets. Use the required date format specification to enter the start and
    end dates for each time period during which you want discussions to be
    closed.
 
-   When you enter the dates and times from the example above, the **Policy
-   Value** field looks like this:
+   When you enter the dates and times from the example above, the value field looks like this:
 
    .. image:: ../Images/Discussion_blackout_unformatted.png
      :alt: Policy value of [["2014-07-22T08:00", "2014-07-25T18:00"],
