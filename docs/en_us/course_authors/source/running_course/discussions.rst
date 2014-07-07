@@ -45,7 +45,7 @@ Together, a post, its responses, and the comments on those repsonses are called 
 
 All course staff members and enrolled students can add posts, reponses, and
 comments, and view all of the posts, responses, and comments made by the
-others. Discussion threads are saved as part of the course.
+others. Discussion threads are saved as part of the course history.
 
 .. _Organizing_discussions:
 
