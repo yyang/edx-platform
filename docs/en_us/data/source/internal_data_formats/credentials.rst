@@ -64,8 +64,8 @@ Create Keys: Windows
    a. When you are prompted to specify the type of key pair you want, click
       **Create personal OpenPGP key pair**.
 
-   b.  When you are prompted for your email address, be sure to enter **your
-       official university or institution email address**. EdX cannot use
+   b.  When you are prompted for your email address, be sure to enter *your
+       official university or institution email address*. EdX cannot use
        public keys that are based on personal or other non-official email
        addresses to encrypt data.
 
@@ -97,8 +97,8 @@ Create Keys: Macintosh
    When installation is complete, GPG Keychain Access opens a web page with
    `First Steps`_ and a dialog box.
 
-#. Enter your name and email address. Be sure to enter **your official
-   university or institution email address**. EdX cannot use public keys that
+#. Enter your name and email address. Be sure to enter *your official
+   university or institution email address*. EdX cannot use public keys that
    are based on personal or other non-official email addresses to encrypt data.
 
 #. Click **Generate key**. A dialog box opens to prompt you for a passphrase.
