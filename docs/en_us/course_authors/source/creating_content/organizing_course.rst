@@ -312,12 +312,12 @@ Components that Contain Other Components
 ******************************************
 
 For specific use cases, you configure course content so that components contain
-other components.  For example, if you want to include conditional components or
-content experiments, you have to create components inside components. See
-:ref:`Working with Content Experiments` for more information.
+other components.  For example, if you want to include conditional components
+or content experiments, you have to create components inside components. See
+:ref:`Creating Content Experiments` for more information.
 
-The component that contains other components is referred to as the *parent*; the
-contained components are referred to as *children*.
+The component that contains other components is referred to as the *parent*;
+the contained components are referred to as *children*.
 
 In the unit page, a parent component appears with the display name and a
 **View** link. For example:
@@ -346,8 +346,8 @@ View Child Components
 ======================================
 
 When you click **View** in the parent component, the parent component page
-opens, showing all child components. In this example, Child Component A contains
-an HTML component and a video:
+opens, showing all child components. In this example, Child Component A
+contains an HTML component and a video:
 
 .. image:: ../Images/child-components-a.png
  :alt: Image of an expanded child component
@@ -371,7 +371,8 @@ See:
 Add a Child Component
 ======================================
 
-If the containing unit is private or in draft, you can add a child component in its parent component.
+If the containing unit is private or in draft, you can add a child component in
+its parent component.
 
 To add a child component, open and expand the parent component. Then click the
 component type that you want under **Add New Component** within the parent
@@ -396,9 +397,12 @@ XML for Parent and Child Components
 You develop parent and child components in XML, then import the XML course into
 Studio to verify that the structure is as you intended. 
 
-For more information about working with your course's XML files, including information about terminology, see the `edX XML Tutorial <http://edx.readthedocs.org/projects/devdata/en/latest/course_data_formats/course_xml.html>`_.
+For more information about working with your course's XML files, including
+information about terminology, see the `edX XML Tutorial <http://edx.readthedoc
+s.org/projects/devdata/en/latest/course_data_formats/course_xml.html>`_.
 
-The following examples show the XML used to create the unit and components shown in Studio above.
+The following examples show the XML used to create the unit and components
+shown in Studio above.
 
 The XML for the unit is:
 
@@ -474,10 +478,11 @@ screen until the mouse pointer changes to a four-headed arrow. Then, click and
 drag the element to the location that you want.
 
 .. image:: ../Images/DragAndDropExample.png
- :alt: Image of the course outline, with the handle for a unit selected for  drag and drop
+ :alt: Image of the course outline, with the handle for a unit selected for
+     drag and drop
 
-When you move an element, a blue line indicates where the element will land when
-you release the mouse.
+When you move an element, a blue line indicates where the element will land
+when you release the mouse.
 
 .. image:: ../Images/DragAndDrop_BlueLine.png
  :alt: Image of the course outline, with a unit being dragged to a different
@@ -489,8 +494,8 @@ Reorganizing Child Components
 
 You can reorganize child components through the same drag and drop process you
 use for other objects in your course outline. You hover over the element handle
-on the right side of the screen until the mouse pointer changes to a four-headed
-arrow. Then, click and drag the element to the location that you want.
+on the right side of the screen until the mouse pointer changes to a four-
+headed arrow. Then, click and drag the element to the location that you want.
 
 Furthermore, when you have multiple levels of nesting, you can drag a child
 component into a different parent component, if both parents are expanded. For
