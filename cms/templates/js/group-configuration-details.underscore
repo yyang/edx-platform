@@ -23,17 +23,15 @@
         <li class="group-configuration-groups-count">
             <%= groupsCountMessage %>
         </li>
-        <% if (usage.length > 0) { %>
-          <li class="group-configuration-groups-count">
+        <li class="group-configuration-groups-count">
+          <% if (!_.isEmpty(usage)) { %>
             <span class="group-configuration-label">is used in: </span>
             <span class="group-configuration-value"><%= usage.length %></span>
             <span class="group-configuration-label"> units</span>
-          </li>
-        <% } else { %>
-          <li class="group-configuration-groups-count">
+          <% } else { %>
             <span class="group-configuration-value">Not in use</span>
-          </li>
-        <% } %>
+          <% } %>
+        </li>
       <% } %>
     </ol>
 
@@ -47,7 +45,7 @@
             ></li>
           <% }) %>
         </ol>
-        <% if (usage.length > 0) { %>
+        <% if (!_.isEmpty(usage)) { %>
           <ol class="groups">
             <li class="group-configuration-description">
               Group configuration is used in:

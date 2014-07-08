@@ -53,7 +53,6 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 name: this.get('name'),
                 description: this.get('description'),
                 groups: this.get('groups').toJSON(),
-                usage: JSON.stringify(this.get('usage'))
             };
         },
 
