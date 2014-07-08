@@ -316,6 +316,12 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     fetch({ "id": "locator-container", "published": false });
                     expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
                 });
+
+                it('renders correctly when the block is published without publish info', function () {
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    fetch({ "id": "locator-container", "published": true, "published_on": null, "published_by": null});
+                    expect(containerPage.$(lastPublishCss).text()).toContain("Previously published");
+                });
             });
         });
     });
