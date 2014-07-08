@@ -1,0 +1,10 @@
+<div class="wrapper-last-publish">
+    <p class="copy meta">
+        <% if (published) {
+            var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
+            <%= interpolate(message, { last_published_date: published_on, publish_username: published_by }, true) %>
+        <% } else { %>
+            <%= gettext("Never published") %>
+        <% } %>
+    </p>
+</div>

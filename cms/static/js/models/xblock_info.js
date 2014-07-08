@@ -41,6 +41,14 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
              */
             "edited_by":null,
             /**
+             * Date of the last publish of this xblock, or null if never published.
+             */
+            "published_on": null,
+            /**
+             * User who last published the xblock, or null if never published.
+             */
+            "published_by": null,
+            /**
              * If the xblock is published, the date on which it will be released to students.
              */
             "release_date": null,
