@@ -582,6 +582,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "edited_by": edited_by,
         'is_container': is_container,
         'studio_url': xblock_studio_url(xblock),
+        'release_date': get_default_time_display(xblock.start),
     }
     if data is not None:
         xblock_info["data"] = data
@@ -591,6 +592,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if include_child_info and is_container:
         xblock_info['child_info'] = _create_xblock_child_info(xblock, recurse_child_info=recurse_child_info)
+    if xblock.graded:
+        xblock_info['due_date'] = get_default_time_display(xblock.due)
+        # xblock_info['grading_type'] = xblock.grading_policy
     return xblock_info
 
 

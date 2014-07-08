@@ -47,6 +47,11 @@
                         <i class="icon-time"></i>
                         <%= gettext('Scheduled:') %> Dec 31, 2015 at 21:00 UTC
                     <% } %>
+                    <% if (xblockInfo.get('due_date')) { %>
+                        <i class="icon-time"></i>
+                        <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
+                        <%= gettext('Policy:') %> <%= xblockInfo.get('grading_policy') %>
+                    <% } %>
                 </div>
             <% } %>
 
