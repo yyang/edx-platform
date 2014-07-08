@@ -67,7 +67,7 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
             /**
             * Grading policy for xblock
             **/
-            "grading_policy": null,
+            "grading_format": null,
         },
 
         parse: function(response) {

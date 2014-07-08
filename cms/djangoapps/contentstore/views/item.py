@@ -28,6 +28,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
 from contentstore.utils import compute_publish_state
 from xmodule.modulestore import PublishState
+from xmodule.seq_module import SequenceDescriptor
 from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
@@ -594,7 +595,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['child_info'] = _create_xblock_child_info(xblock, recurse_child_info=recurse_child_info)
     if xblock.graded:
         xblock_info['due_date'] = get_default_time_display(xblock.due)
-        # xblock_info['grading_type'] = xblock.grading_policy
+        xblock_info['grading_format'] = xblock.format
     return xblock_info
 
 
