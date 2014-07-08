@@ -22,7 +22,6 @@ class ExportAllCourses(ModuleStoreTestCase):
         self.content_store = contentstore()
         self.module_store = modulestore()
 
-
     def test_export_all_courses(self):
         """
         This test validates that redundant Mac metadata files ('._example.txt', '.DS_Store') are
@@ -41,29 +40,33 @@ class ExportAllCourses(ModuleStoreTestCase):
         course = self.module_store.get_course(SlashSeparatedCourseKey('edX', 'dot-underscore', '2014_Fall'))
         self.assertIsNotNone(course)
 
-        # check that there is only one asset in contentstore for imported course
+        # check that there are two assets ['example.txt', '.example.txt'] in contentstore for imported course
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
-        self.assertEqual(count, 1)
-        asset = all_assets[0]
-        self.assertEqual(asset['_id']['name'], u'example.txt')
+        self.assertEqual(count, 2)
+        self.assertEqual(all_assets[0]['_id']['name'], u'.example.txt')
+        self.assertEqual(all_assets[1]['_id']['name'], u'example.txt')
 
-        # manually add a redundant asset (filename starts with "._")
+        # manually add redundant assets (file ".DS_Store" and filename starts with "._")
         course_filter = course.id.make_asset_key("asset", None)
         query = location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG)
-        query['_id.name'] = asset['_id']['name']
+        query['_id.name'] = all_assets[0]['_id']['name']
         asset_doc = self.content_store.fs_files.find_one(query)
         asset_doc['_id']['name'] = u'._example_test.txt'
         self.content_store.fs_files.insert(asset_doc)
+        asset_doc['_id']['name'] = u'.DS_Store'
+        self.content_store.fs_files.insert(asset_doc)
 
-        # check that now course has two assets
+        # check that now course has four assets
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
-        self.assertEqual(count, 2)
-        self.assertEqual(all_assets[0]['_id']['name'], u'example.txt')
-        self.assertEqual(all_assets[1]['_id']['name'], u'._example_test.txt')
+        self.assertEqual(count, 4)
+        self.assertEqual(all_assets[0]['_id']['name'], u'.example.txt')
+        self.assertEqual(all_assets[1]['_id']['name'], u'example.txt')
+        self.assertEqual(all_assets[2]['_id']['name'], u'._example_test.txt')
+        self.assertEqual(all_assets[3]['_id']['name'], u'.DS_Store')
 
-        # now call asset_cleanup command and check that there is only one proper asset in contentstore for the course
+        # now call asset_cleanup command and check that there is only two proper assets in contentstore for the course
         call_command('cleanup_assets')
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
-        self.assertEqual(count, 1)
-        asset = all_assets[0]
-        self.assertEqual(asset['_id']['name'], u'example.txt')
+        self.assertEqual(count, 2)
+        self.assertEqual(all_assets[0]['_id']['name'], u'.example.txt')
+        self.assertEqual(all_assets[1]['_id']['name'], u'example.txt')

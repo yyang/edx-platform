@@ -34,5 +34,8 @@ class IgnoredFilesTestCase(unittest.TestCase):
         saved_static_content = [call[0][0] for call in content_store.save.call_args_list]
         name_val = {sc.name: sc.data for sc in saved_static_content}
         self.assertIn("example.txt", name_val)
+        self.assertIn(".example.txt", name_val)
         self.assertNotIn("._example.txt", name_val)
+        self.assertNotIn(".DS_Store", name_val)
         self.assertIn("GREEN", name_val["example.txt"])
+        self.assertIn("BLUE", name_val[".example.txt"])

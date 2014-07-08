@@ -21,14 +21,12 @@ class Command(BaseCommand):
         module_store = modulestore()
         courses = module_store.get_courses()
 
-        print(u"{0} courses to cleanup:".format(len(courses)))
         course_ids = [x.id for x in courses]
-        print(course_ids)
         cleanup_failed_courses = []
 
         for course_id in course_ids:
 
-            print(u"-" * 77)
+            print(u"-" * 80)
             print(u"Cleaning up assets for course id = {0}".format(course_id))
 
             try:
