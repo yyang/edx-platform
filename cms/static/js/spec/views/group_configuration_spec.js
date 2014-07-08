@@ -132,6 +132,7 @@ define([
         beforeEach(function() {
             view_helpers.installViewTemplates();
             view_helpers.installTemplate('group-configuration-edit');
+            view_helpers.installTemplate('group-edit');
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -154,10 +155,19 @@ define([
             });
         });
 
+        it ('should allow you to create new empty groups', function() {
+            var numGroups = this.model.get('groups').length;
+            this.view.$('.action-add-group').click();
+            expect(this.model.get('groups').length).toEqual(numGroups + 1);
+            expect(this.model.get('groups').last().isEmpty()).toBeTruthy();
+        });
+
         it('should save properly', function() {
             var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy();
+                notificationSpy = view_helpers.createNotificationSpy(),
+                groups;
 
+            this.model.get('groups').add([{ name: 'Group C' }]);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'
@@ -172,6 +182,10 @@ define([
                 name: 'New Configuration',
                 description: 'New Description'
             });
+
+            groups = this.model.get('groups');
+            expect(groups.length).toBe(3);
+            expect(groups.at(2).get('name')).toBe('Group C');
             expect(this.view.$el).not.toExist();
         });
 
@@ -187,10 +201,14 @@ define([
         });
 
         it('does not save on cancel', function() {
+            this.model.get('groups').add([{ name: 'Group C' }]);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'
             });
+
+            expect(this.model.get('groups').length).toBe(3);
+
             this.view.$('.action-cancel').click();
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'Configuration',
@@ -199,6 +217,7 @@ define([
             // Model is still exist in the collection
             expect(this.collection.indexOf(this.model)).toBeGreaterThan(-1);
             expect(this.collection.length).toBe(1);
+            expect(this.model.get('groups').length).toBe(2);
         });
 
         it('should be removed on cancel if it is a new item', function() {
@@ -250,15 +269,14 @@ define([
         });
 
         describe('removes all empty groups on cancel', function () {
-            it('the model has a non-empty group', function() {
+            it('the model has a non-empty groups', function() {
                 var groups = this.model.get('groups');
 
                 this.view.render();
-                groups.add([{}, {}, {}]);
-                expect(groups.length).toEqual(5);
+                groups.add([{ name: 'non-empty' }]);
+                expect(groups.length).toEqual(3);
                 this.view.$('.action-cancel').click();
                 expect(groups.length).toEqual(2);
-                expect(groups.first().get('name')).toEqual('Group A');
             });
 
             it('except two if the model has no non-empty groups', function() {
@@ -332,13 +350,13 @@ define([
 
     describe('GroupEdit', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-edit-tpl', true);
+            view_helpers.installTemplate('group-edit', true);
 
             this.model = new GroupModel({
                 name: 'Group A'
             });
 
-            this.collection = new GroupSet([this.model]);
+            this.collection = new GroupCollection([this.model]);
 
             this.view = new GroupEdit({
                 model: this.model
@@ -346,10 +364,15 @@ define([
         });
 
         describe('Basic', function () {
-            it('can render', function() {
+            it('can render properly', function() {
                 this.view.render();
                 expect(this.view.$('.group-name').val()).toBe('Group A');
                 expect(this.view.$('.group-allocation')).toContainText('100%');
+            });
+
+            it ('can delete itself', function() {
+                this.view.render().$('.action-close').click();
+                expect(this.collection.length).toEqual(0);
             });
         });
 

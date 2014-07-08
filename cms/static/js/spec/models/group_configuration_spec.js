@@ -161,20 +161,16 @@ define([
             });
 
             it('can pass validation', function() {
-                var group = new GroupModel(),
-                    model = new GroupConfigurationModel({ name: 'foo' });
-
-                spyOn(group, 'isValid').andReturn(true);
-                model.get('groups').reset([group]);
+                var model = new GroupConfigurationModel({ name: 'foo' });
 
                 expect(model.isValid()).toBeTruthy();
             });
 
             it('requires at least two groups', function() {
-                var group1 = new GroupModel(),
-                    group2 = new GroupModel(),
+                var group1 = new GroupModel({ name: 'Group A' }),
+                    group2 = new GroupModel({ name: 'Group B' }),
                     model = new GroupConfigurationModel({ name: 'foo' });
-                
+
                 model.get('groups').reset([group1]);
                 expect(model.isValid()).toBeFalsy();
 
@@ -186,19 +182,16 @@ define([
                 var group = new GroupModel(),
                     model = new GroupConfigurationModel({ name: 'foo' });
 
-                spyOn(group, 'isValid').andReturn(false);
                 model.get('groups').reset([group]);
 
                 expect(model.isValid()).toBeFalsy();
             });
 
             it('requires all groups to be valid', function() {
-                var group1 = new GroupModel(),
+                var group1 = new GroupModel({ name: 'Group A' }),
                     group2 = new GroupModel(),
                     model = new GroupConfigurationModel({ name: 'foo' });
 
-                spyOn(group1, 'isValid').andReturn(true);
-                spyOn(group2, 'isValid').andReturn(false);
                 model.get('groups').reset([group1, group2]);
 
                 expect(model.isValid()).toBeFalsy();

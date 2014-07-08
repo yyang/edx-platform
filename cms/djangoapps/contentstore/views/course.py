@@ -907,12 +907,6 @@ class GroupConfiguration(object):
         if not group_configuration.get('version'):
             group_configuration['version'] = UserPartition.VERSION
 
-        # this is temporary logic, we are going to build default groups on front-end
-        if not group_configuration.get('groups'):
-            group_configuration['groups'] = [
-                {'name': 'Group A'}, {'name': 'Group B'},
-            ]
-
         for group in group_configuration['groups']:
             group['version'] = Group.VERSION
 

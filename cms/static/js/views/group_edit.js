@@ -7,9 +7,10 @@ function(BaseView, _, str, $, gettext) {
     var GroupEdit = BaseView.extend({
         tagName: 'li',
         events: {
+            "click .action-close": "removeGroup",
             'change .group-name': 'changeName',
-            'focus .group-name': 'onFocus',
-            'blur .group-name': 'onBlur'
+            'focus .groups-fields': 'onFocus',
+            'blur .groups-fields': 'onBlur'
         },
 
         className: function() {
@@ -43,6 +44,12 @@ function(BaseView, _, str, $, gettext) {
             }, {silent: true});
 
             return this;
+        },
+
+        removeGroup: function(e) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            this.model.collection.remove(this.model);
+            return this.remove();
         },
 
         getAllocation: function() {

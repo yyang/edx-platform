@@ -1,13 +1,15 @@
 define([
-    'js/views/baseview', 'underscore', 'jquery', 'gettext'
+    'js/views/baseview', 'underscore', 'jquery', 'gettext',
+    'js/views/group_edit'
 ],
-function(BaseView, _, $, gettext) {
+function(BaseView, _, $, gettext, GroupEdit) {
     'use strict';
     var GroupConfigurationEdit = BaseView.extend({
         tagName: 'div',
         events: {
             'change .group-configuration-name-input': 'setName',
             'change .group-configuration-description-input': 'setDescription',
+            "click .action-add-group": "createGroup",
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
             'submit': 'setAndClose',
@@ -24,6 +26,8 @@ function(BaseView, _, $, gettext) {
         },
 
         initialize: function() {
+            var groups;
+
             this.template = this.loadTemplate('group-configuration-edit');
             this.listenTo(this.model, 'invalid', this.render);
             groups = this.model.get('groups');
@@ -47,7 +51,7 @@ function(BaseView, _, $, gettext) {
         },
 
         addOne: function(group) {
-            var view = new GroupEditView({ model: group });
+            var view = new GroupEdit({ model: group });
             this.$('ol.groups').append(view.render().el);
 
             return this;
@@ -55,6 +59,11 @@ function(BaseView, _, $, gettext) {
 
         addAll: function() {
             this.model.get('groups').each(this.addOne, this);
+        },
+
+        createGroup: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            this.model.get('groups').add([{}]);
         },
 
         setName: function(event) {
