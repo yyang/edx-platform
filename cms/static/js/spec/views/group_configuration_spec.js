@@ -3,13 +3,15 @@ define([
     'js/collections/group_configuration',
     'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
-    'js/views/group_configuration_item', 'js/views/feedback_notification',
-    'js/spec_helpers/create_sinon', 'js/spec_helpers/edit_helpers',
-    'jasmine-stealth'
+    'js/views/group_configuration_item', 'js/models/group',
+    'js/collections/group', 'js/views/group_edit',
+    'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
+    'js/spec_helpers/edit_helpers', 'jasmine-stealth'
 ], function(
     Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
-    GroupConfigurationItem, Notification, create_sinon, view_helpers
+    GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
+    Notification, create_sinon, view_helpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -90,7 +92,7 @@ define([
         });
 
         it('should show groups appropriately', function() {
-            this.model.get('groups').add([{}, {}, {}]);
+            this.model.get('groups').add([{}]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
 
@@ -104,7 +106,7 @@ define([
         });
 
         it('should hide groups appropriately', function() {
-            this.model.get('groups').add([{}, {}, {}]);
+            this.model.get('groups').add([{}]);
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
 
@@ -246,6 +248,29 @@ define([
             element.blur();
             expect(parent).not.toHaveClass('is-focused');
         });
+
+        describe('removes all empty groups on cancel', function () {
+            it('the model has a non-empty group', function() {
+                var groups = this.model.get('groups');
+
+                this.view.render();
+                groups.add([{}, {}, {}]);
+                expect(groups.length).toEqual(5);
+                this.view.$('.action-cancel').click();
+                expect(groups.length).toEqual(2);
+                expect(groups.first().get('name')).toEqual('Group A');
+            });
+
+            it('except two if the model has no non-empty groups', function() {
+                var groups = this.model.get('groups');
+
+                this.view.render();
+                groups.add([{}, {}, {}]);
+                expect(groups.length).toEqual(5);
+                this.view.$('.action-cancel').click();
+                expect(groups.length).toEqual(2);
+            });
+        });
     });
 
     describe('GroupConfigurationsList', function() {
@@ -302,6 +327,43 @@ define([
             this.view.$('.action-cancel').click();
             expect(this.view.$(SELECTORS.detailsView)).toExist();
             expect(this.view.$(SELECTORS.editView)).not.toExist();
+        });
+    });
+
+    describe('GroupEdit', function() {
+        beforeEach(function() {
+            view_helpers.installTemplate('group-edit-tpl', true);
+
+            this.model = new GroupModel({
+                name: 'Group A'
+            });
+
+            this.collection = new GroupSet([this.model]);
+
+            this.view = new GroupEdit({
+                model: this.model
+            });
+        });
+
+        describe('Basic', function () {
+            it('can render', function() {
+                this.view.render();
+                expect(this.view.$('.group-name').val()).toBe('Group A');
+                expect(this.view.$('.group-allocation')).toContainText('100%');
+            });
+        });
+
+        describe('getGroupId', function () {
+            it('returns correct ids', function () {
+                expect(this.view.getGroupId(0)).toBe('A');
+                expect(this.view.getGroupId(1)).toBe('B');
+                expect(this.view.getGroupId(25)).toBe('Z');
+                expect(this.view.getGroupId(702)).toBe('AAA');
+                expect(this.view.getGroupId(704)).toBe('AAC');
+                expect(this.view.getGroupId(475253)).toBe('ZZZZ');
+                expect(this.view.getGroupId(475254)).toBe('AAAAA');
+                expect(this.view.getGroupId(475279)).toBe('AAAAZ');
+            });
         });
     });
 });

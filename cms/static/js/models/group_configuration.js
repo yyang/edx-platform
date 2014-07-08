@@ -10,7 +10,9 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
             return {
                 name: '',
                 description: '',
-                groups: new GroupCollection([]),
+                groups: new GroupCollection([
+                    { name: 'Group A' }, { name: 'Group B' }
+                ]),
                 showGroups: false,
                 editing: false
             };
@@ -61,6 +63,27 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                     message: gettext('Group Configuration name is required'),
                     attributes: {name: true}
                 };
+            }
+
+            if (attrs.groups.length < 2) {
+                return {
+                    message: gettext('Please add at least two groups'),
+                    attributes: { groups: true }
+                };
+            } else {
+                // validate all groups
+                var invalidGroups = [];
+                attrs.groups.each(function(group) {
+                    if(!group.isValid()) {
+                        invalidGroups.push(group);
+                    }
+                });
+                if (!_.isEmpty(invalidGroups)) {
+                    return {
+                        message: gettext('All groups must have a name'),
+                        attributes: { groups: invalidGroups }
+                    };
+                }
             }
         }
     });

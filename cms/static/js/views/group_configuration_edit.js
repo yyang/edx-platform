@@ -26,6 +26,10 @@ function(BaseView, _, $, gettext) {
         initialize: function() {
             this.template = this.loadTemplate('group-configuration-edit');
             this.listenTo(this.model, 'invalid', this.render);
+            groups = this.model.get('groups');
+            this.listenTo(groups, 'add', this.addOne);
+            this.listenTo(groups, 'reset', this.addAll);
+            this.listenTo(groups, 'all', this.render);
         },
 
         render: function() {
@@ -37,8 +41,20 @@ function(BaseView, _, $, gettext) {
                 isNew: this.model.isNew(),
                 error: this.model.validationError
             }));
+            this.addAll();
 
             return this;
+        },
+
+        addOne: function(group) {
+            var view = new GroupEditView({ model: group });
+            this.$('ol.groups').append(view.render().el);
+
+            return this;
+        },
+
+        addAll: function() {
+            this.model.get('groups').each(this.addOne, this);
         },
 
         setName: function(event) {
@@ -61,6 +77,16 @@ function(BaseView, _, $, gettext) {
         setValues: function() {
             this.setName();
             this.setDescription();
+
+            _.each(this.$('.groups li'), function(li, i) {
+                var group = this.model.get('groups').at(i);
+
+                if(group) {
+                    group.set({
+                        'name': $('.group-name', li).val()
+                    });
+                }
+            }.bind(this));
 
             return this;
         },

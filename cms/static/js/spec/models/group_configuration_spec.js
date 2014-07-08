@@ -32,11 +32,12 @@ define([
                 expect(this.model.get('showGroups')).toBeFalsy();
             });
 
-            it('should be empty by default', function() {
+            it('should have a GroupSet with two groups by default', function() {
                 var groups = this.model.get('groups');
 
                 expect(groups).toBeInstanceOf(GroupCollection);
-                expect(this.model.isEmpty()).toBeTruthy();
+                expect(groups.at(0).get('name')).toBe('Group A');
+                expect(groups.at(1).get('name')).toBe('Group B');
             });
 
             it('should be able to reset itself', function() {
@@ -160,9 +161,47 @@ define([
             });
 
             it('can pass validation', function() {
-                var model = new GroupModel({ name: 'a' });
+                var group = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                spyOn(group, 'isValid').andReturn(true);
+                model.get('groups').reset([group]);
 
                 expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires at least two groups', function() {
+                var group1 = new GroupModel(),
+                    group2 = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+                
+                model.get('groups').reset([group1]);
+                expect(model.isValid()).toBeFalsy();
+
+                model.get('groups').add(group2);
+                expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires a valid group', function() {
+                var group = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                spyOn(group, 'isValid').andReturn(false);
+                model.get('groups').reset([group]);
+
+                expect(model.isValid()).toBeFalsy();
+            });
+
+            it('requires all groups to be valid', function() {
+                var group1 = new GroupModel(),
+                    group2 = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                spyOn(group1, 'isValid').andReturn(true);
+                spyOn(group2, 'isValid').andReturn(false);
+                model.get('groups').reset([group1, group2]);
+
+                expect(model.isValid()).toBeFalsy();
             });
         });
     });
