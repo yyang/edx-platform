@@ -45,7 +45,7 @@ class SplitModuleTest(unittest.TestCase):
     }
 
     MODULESTORE = {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }

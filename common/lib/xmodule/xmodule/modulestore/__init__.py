@@ -22,6 +22,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
+from decorator import contextmanager
 
 log = logging.getLogger('edx.modulestore')
 
@@ -503,6 +504,29 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
         self.update_item(new_object, user_id, allow_not_found=True)
         return new_object
+
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO
+        # Make this multi-process-safe if future operations need it.
+        # Right now, only Import Course, Clone Course, and Delete Course use this, so
+        # it's ok if the cached metadata in the memcache is invalid when another
+        # request comes in for the same course.
+        try:
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._begin_bulk_write_operation(course_id)
+            yield
+        finally:
+            # check for the begin method here,
+            # since it's an error if an end method is not defined when a begin method is
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

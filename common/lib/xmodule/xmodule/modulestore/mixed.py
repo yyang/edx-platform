@@ -12,7 +12,7 @@ from opaque_keys import InvalidKeyError
 
 from . import ModuleStoreWriteBase
 from xmodule.modulestore import PublishState
-from xmodule.modulestore.django import create_modulestore_instance, loc_mapper
+from xmodule.modulestore.django import create_modulestore_instance
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -65,8 +65,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
             )
-            if key == 'split':
-                store.loc_mapper = loc_mapper()
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
                 if store_name == key:
@@ -187,24 +185,12 @@ class MixedModuleStore(ModuleStoreWriteBase):
             if course is not None:
                 courses[course_id] = store.get_course(course_id)
 
-        has_locators = any(issubclass(CourseLocator, store.reference_type) for store in self.modulestores)
         for store in self.modulestores:
 
             # filter out ones which were fetched from earlier stores but locations may not be ==
             for course in store.get_courses():
                 course_id = self._clean_course_id_for_mapping(course.id)
                 if course_id not in courses:
-                    if has_locators and isinstance(course_id, SlashSeparatedCourseKey):
-
-                        # see if a locator version of course is in the result
-                        try:
-                            course_locator = loc_mapper().translate_location_to_course_locator(course_id)
-                            if course_locator in courses:
-                                continue
-                        except ItemNotFoundError:
-                            # if there's no existing mapping, then the course can't have been in split
-                            pass
-
                     # course is indeed unique. save it in result
                     courses[course_id] = course
 

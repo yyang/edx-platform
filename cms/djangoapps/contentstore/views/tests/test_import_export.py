@@ -17,7 +17,6 @@ from django.conf import settings
 from contentstore.utils import reverse_course_url
 
 from xmodule.contentstore.django import _CONTENTSTORE
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import ItemFactory
 
 from contentstore.tests.utils import CourseTestCase
