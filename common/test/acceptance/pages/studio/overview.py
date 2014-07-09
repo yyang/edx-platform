@@ -169,6 +169,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css='{} .section-name'.format(parent_css)).first.click()
 
+    def click_subsection_name(self, parent_css=''):
+        """
+        Find and click on first subsection name in course outline
+        """
+        self.q(css='{} .subsection-name'.format(parent_css)).first.click()
+
     def get_section_name(self, parent_css='', page_refresh=False):
         """
         Get the list of names of all sections present
