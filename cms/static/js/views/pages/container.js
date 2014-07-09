@@ -34,11 +34,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/contai
                     });
                     this.xblockPublisher.render();
 
-                    this.publishInfo = new ContainerSubviews.PublishInfo({
-                        el: this.$('#publish-info'),
+                    this.publishHistory = new ContainerSubviews.PublishHistory({
+                        el: this.$('#publish-history'),
                         model: this.model
                     });
-                    this.publishInfo.render();
+                    this.publishHistory.render();
 
                     // No need to render initially. This is only used for updating state
                     // when the unit changes visibility.

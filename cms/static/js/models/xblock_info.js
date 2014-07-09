@@ -41,6 +41,14 @@ define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
              */
             "edited_by":null,
             /**
+             * Date of the last edit to this xblock or any of its descendants.
+             */
+            "subtree_edited_on": null,
+            /**
+             * User who last edited the xblock or any of its descendants.
+             */
+            "subtree_edited_by": null,
+            /**
              * Date of the last publish of this xblock, or null if never published.
              */
             "published_on": null,

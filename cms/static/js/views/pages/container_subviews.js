@@ -98,8 +98,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
             onSync: function(e) {
                 if (e.changedAttributes() &&
                     (('has_changes' in e.changedAttributes()) || ('published' in e.changedAttributes()) ||
-                    ('edited_on' in e.changedAttributes()) || ('edited_by' in e.changedAttributes()) ||
-                    ('published_on' in e.changedAttributes()) || ('published_by' in e.changedAttributes()))) {
+                    ('subtree_edited_on' in e.changedAttributes()) || ('subtree_edited_by' in e.changedAttributes()))) {
                    this.render();
                 }
             },
@@ -108,8 +107,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
                 this.$el.html(this.template({
                     has_changes: this.model.get('has_changes'),
                     published: this.model.get('published'),
-                    edited_on: this.model.get('edited_on'),
-                    edited_by: this.model.get('edited_by'),
+                    subtree_edited_on: this.model.get('subtree_edited_on'),
+                    subtree_edited_by: this.model.get('subtree_edited_by'),
                     published_on: this.model.get('published_on'),
                     published_by: this.model.get('published_by')
                 }));
@@ -178,14 +177,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
         });
 
         /**
-         * PublishInfo displays when and by whom the xblock was last published, if it ever was.
+         * PublishHistory displays when and by whom the xblock was last published, if it ever was.
          */
-        var PublishInfo = BaseView.extend({
+        var PublishHistory = BaseView.extend({
             // takes XBlockInfo as a model
 
             initialize: function () {
                 BaseView.prototype.initialize.call(this);
-                this.template = this.loadTemplate('publish-info');
+                this.template = this.loadTemplate('publish-history');
                 this.model.on('sync', this.onSync, this);
             },
 
@@ -211,6 +210,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/feedba
             'VisibilityStateController': VisibilityStateController,
             'PreviewActionController': PreviewActionController,
             'Publisher': Publisher,
-            'PublishInfo': PublishInfo
+            'PublishHistory': PublishHistory
         };
     }); // end define();

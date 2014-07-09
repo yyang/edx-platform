@@ -9,9 +9,9 @@
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
-            <% if (has_changes && edited_on && edited_by) {
+            <% if (has_changes && subtree_edited_on && subtree_edited_by) {
                 var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
-                <%= interpolate(message, { last_saved_date: edited_on, edit_username: edited_by }, true) %>
+                <%= interpolate(message, { last_saved_date: subtree_edited_on, edit_username: subtree_edited_by }, true) %>
             <% } else if (published_on && published_by) {
                 var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
                 <%= interpolate(message, { last_published_date: published_on, publish_username: published_by }, true) %>
