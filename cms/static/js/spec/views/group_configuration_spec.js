@@ -13,8 +13,8 @@ define([
 ) {
     'use strict';
     var SELECTORS = {
-        detailsView: '.view-group-configuration-details',
-        editView: '.view-group-configuration-edit',
+        detailsView: '.group-configuration-details',
+        editView: '.group-configuration-edit',
         itemView: '.group-configurations-list-item',
         group: '.group',
         name: '.group-configuration-name',
@@ -235,16 +235,6 @@ define([
             // Error message disappear
             expect(this.view.$(SELECTORS.errorMessage)).not.toExist();
             expect(requests.length).toBe(1);
-        });
-
-        it('should have appropriate class names on focus/blur', function () {
-            var element = this.view.$(SELECTORS.inputName),
-                parent = this.view.$('.add-group-configuration-name');
-
-            element.focus();
-            expect(parent).toHaveClass('is-focused');
-            element.blur();
-            expect(parent).not.toHaveClass('is-focused');
         });
     });
 

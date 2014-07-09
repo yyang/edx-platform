@@ -75,9 +75,9 @@ class GroupConfiguration(object):
         """
         Returns group configuration mode.
         """
-        if self.find_css('.view-group-configuration-edit').present:
+        if self.find_css('.group-configuration-edit').present:
             return 'edit'
-        elif self.find_css('.view-group-configuration-details').present:
+        elif self.find_css('.group-configuration-details').present:
             return 'details'
 
     @property

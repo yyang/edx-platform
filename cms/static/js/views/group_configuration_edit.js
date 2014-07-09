@@ -18,8 +18,8 @@ function(BaseView, _, $, gettext) {
             var index = this.model.collection.indexOf(this.model);
 
             return [
-                'view-group-configuration-edit',
-                'view-group-configuration-edit-' + index
+                'group-configuration-edit',
+                'group-configuration-edit-' + index
             ].join(' ');
         },
 
@@ -111,14 +111,6 @@ function(BaseView, _, $, gettext) {
             }
 
             return this;
-        },
-
-        onFocus: function (event) {
-            $(event.target).parent().addClass('is-focused');
-        },
-
-        onBlur: function (event) {
-            $(event.target).parent().removeClass('is-focused');
         }
     });
 

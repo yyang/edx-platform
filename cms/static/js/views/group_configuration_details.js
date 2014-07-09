@@ -14,8 +14,8 @@ function(BaseView, _, gettext) {
             var index = this.model.collection.indexOf(this.model);
 
             return [
-                'view-group-configuration-details',
-                'view-group-configuration-details-' + index
+                'group-configuration-details',
+                'group-configuration-details-' + index
             ].join(' ');
         },
 

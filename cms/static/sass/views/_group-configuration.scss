@@ -41,7 +41,7 @@
       position: relative;
       outline: none;
 
-      .view-group-configuration-details {
+      .group-configuration-details {
         padding: $baseline ($baseline*1.5);
 
         .group-configuration-header {
@@ -74,6 +74,7 @@
           margin-left: $baseline;
 
           &.group-configuration-info-inline {
+            @extend %t-copy-sub1;
             display: table;
             width: 70%;
             margin: ($baseline/4) 0 ($baseline/2) $baseline;
@@ -163,7 +164,7 @@
       }
     }
 
-    .view-group-configuration-edit {
+    .group-configuration-edit {
       @include box-sizing(border-box);
       border-radius: 2px;
       width: 100%;
@@ -177,7 +178,7 @@
         @extend %t-copy-sub2;
         @include transition(color, 0.15s, ease-in-out);
         display: block;
-        margin-bottom: ($baseline/4);
+        margin-top: ($baseline/4);
         color: $gray-l3;
       }
 
@@ -300,6 +301,12 @@
 
             :-ms-input-placeholder {
                color: $gray-l3;
+            }
+
+            &:focus {
+              + .tip {
+                color: $gray;
+              }
             }
           }
 

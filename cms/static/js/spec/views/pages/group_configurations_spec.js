@@ -91,7 +91,7 @@ define([
             var view = renderPage();
 
             clickNewConfiguration(view);
-            expect($('.edit-group-configuration').length).toBeGreaterThan(0);
+            expect($('.group-configuration-edit').length).toBeGreaterThan(0);
         });
     });
 });
