@@ -8,6 +8,7 @@ requirejs.config({
         "jquery.form": "xmodule_js/common_static/js/vendor/jquery.form",
         "jquery.markitup": "xmodule_js/common_static/js/vendor/markitup/jquery.markitup",
         "jquery.leanModal": "xmodule_js/common_static/js/vendor/jquery.leanModal.min",
+        "jquery.ajaxQueue": "xmodule_js/common_static/js/vendor/jquery.ajaxQueue",
         "jquery.smoothScroll": "xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min",
         "jquery.scrollTo": "xmodule_js/common_static/js/vendor/jquery.scrollTo-1.4.2-min",
         "jquery.timepicker": "xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker",
@@ -32,6 +33,7 @@ requirejs.config({
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
+        "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
@@ -146,6 +148,9 @@ requirejs.config({
         "sinon": {
             exports: "sinon"
         },
+        "jasmine-jquery": {
+            deps: ["jasmine", "jquery"]
+        },
         "jasmine-stealth": {
             deps: ["jasmine"]
         },
@@ -176,5 +181,6 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 define([
     "coffee/spec/views/assets_spec",
     "js/spec/video/translations_editor_spec",
-    "js/spec/video/file_uploader_editor_spec"
+    "js/spec/video/file_uploader_editor_spec",
+    "js/spec/views/group_configuration_spec"
     ])

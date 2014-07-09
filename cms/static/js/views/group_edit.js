@@ -9,8 +9,8 @@ function(BaseView, _, str, $, gettext) {
         events: {
             "click .action-close": "removeGroup",
             'change .group-name': 'changeName',
-            'focus .groups-fields': 'onFocus',
-            'blur .groups-fields': 'onBlur'
+            'focus .groups-fields input': 'onFocus',
+            'blur .groups-fields input': 'onBlur'
         },
 
         className: function() {
@@ -71,7 +71,7 @@ function(BaseView, _, str, $, gettext) {
                 }
 
                 return {
-                    quotient: Math.floor(numerator/denominator),
+                    quotient: numerator/denominator,
                     remainder: numerator % denominator
                 };
             };
@@ -82,7 +82,7 @@ function(BaseView, _, str, $, gettext) {
                     index;
 
                 if (result) {
-                    index = result.quotient - 1;
+                    index = Math.floor(result.quotient - 1);
 
                     if (index < len) {
                       if (index > -1) {
@@ -95,7 +95,7 @@ function(BaseView, _, str, $, gettext) {
                     return id + dict[result.remainder];
                 }
 
-                return number;
+                return String(number);
             };
         }()),
 

@@ -1,6 +1,7 @@
 define([
-    'backbone', 'underscore.string', 'gettext', 'backbone.associations'
-], function(Backbone, str, gettext) {
+    'backbone', 'underscore', 'underscore.string', 'gettext',
+    'backbone.associations'
+], function(Backbone, _, str, gettext) {
     'use strict';
     _.str = str;
     var Group = Backbone.AssociatedModel.extend({
