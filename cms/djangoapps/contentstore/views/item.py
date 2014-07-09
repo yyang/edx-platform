@@ -490,6 +490,9 @@ def _delete_item(usage_key, user):
     """
     store = modulestore()
 
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=store.fill_in_run(usage_key.course_key))
+
     # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
