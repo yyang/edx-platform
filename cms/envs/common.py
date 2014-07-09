@@ -179,9 +179,8 @@ XQUEUE_INTERFACE = {
 
 ################################# Deprecation warnings #####################
 
-# Filter deprecation warnings to only show the first instance
-# Useful to capture (so we can search Splunk) but don't want the logs littered.
-simplefilter('default')
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
+simplefilter('ignore')
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in

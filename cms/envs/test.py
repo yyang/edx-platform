@@ -149,9 +149,10 @@ INSTALLED_APPS += ('external_auth', )
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
-# Filter deprecation warnings to only show the first instance of the warning
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
 # https://docs.python.org/2/library/warnings.html#the-warnings-filter
-simplefilter('default')  # Change to 'ignore' to ignore all warnings
+simplefilter('ignore')  # Change to "default" to see the first instance of each hit
+                        # or "error" to convert all into errors
 
 ################################# CELERY ######################################
 
