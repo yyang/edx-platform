@@ -30,22 +30,24 @@ Students and staff use course discussions to share ideas, exchange views, and
 consider different viewpoints. In a discussion, there are three hierarchical
 levels of interaction.
 
-* A *post* is the first level of interaction: a post opens a new subject. Posts
+* A *post* is the first level of interaction. A post opens a new subject. Posts
   are often posed as questions, either to start a conversation or to surface an
   issue that requires some action.
 
-* A *response* is the second level of interaction: a reply made directly to the
-  post to provide a solution or opinion, or to continue the conversational
+* A *response* is the second level of interaction. A response is a reply made
+  directly to a post to provide a solution or continue the conversational
   thread.
 
-* A *comment* is the third level of interaction: a clarification or side note
-  made to a specific reponse, rather than to the post as a whole.
+* A *comment* is the third level of interaction. A comment is often a
+  clarification or side note made to a specific reponse, rather than to the
+  post as a whole.
  
-Together, a post, its responses, and the comments on those repsonses are called *thread*. 
+Together, a post, its responses, and the comments on those repsonses are called a *thread*. 
 
 All course staff members and enrolled students can add posts, reponses, and
-comments, and view all of the posts, responses, and comments made by the
-others. Discussion threads are saved as part of the course history.
+comments, and view all of the posts, responses, and comments made by other
+course participants. Discussion threads are saved as part of the course
+history.
 
 .. _Organizing_discussions:
 
@@ -168,32 +170,6 @@ discussion by making contributions, endorsing responses, and guiding student
 messages into pertinent threads. Techniques that you can use throughout your
 course to make discussions successful follow.
 
-========================
-Seed a Discussion
-========================
-
-Before you contribute to a discussion, you can decide whether you want to be identified as a staff member or community TA, or to appear like other students' work. Depending on the subject and your purpose, one or the other might be more appropriate to spark discussion and inform students.
-
-.. You can also post anonymously. Regardless of your role, you can choose to
-.. make a post anonymous. However, you may want to discourage your students
-.. from posting anonymously, and therefore choose not to use this option
-.. yourself.
-
-* To identify your contributions with your role, log in with your discussion
-  administrator email address. The list of posts shows "By: Staff" or "By:
-  Community TA" for your posts, and your responses and comments include a
-  colored banner with "Staff" or "Community TA".
- 
-* To contribute as a student, you must enroll in the course as a student: use
-  the Instructor Dashboard **Membership** page to enroll yourself using a
-  different email address than your staff address, respond to the registration
-  and activation messages sent to that address, and then log in using that
-  email address to join the discussion.
-
-  When you contribute as a student, your posts, responses, and comments do not
-  have a banner or other distinguishing features: they appear the same as any
-  other student post.
-
 ==========================================
 Use Conventions in Discussion Subjects
 ==========================================
@@ -206,12 +182,31 @@ body of a response or comment. Examples follow.
 
 * Provide information about corrected errors with a subject that begins "[ERRATA]".
 
-.. * In the General discussion category, add an "[INTRO]" post to initiate a thread for student and staff introductions.
-
 * Direct students to use "[STAFF]" in the subject of each post that needs the attention of a course staff member.
 
 Both your discussion team and your students can use tags like these to search
 the discussions more effectively.
+
+========================
+Seed Discussions
+========================
+
+To help students learn how to get the most of course discussions, and find the
+best discussion category or topic to use for their questions, you can seed
+discussions by adding posts before your course starts. Some examples follow.
+
+* In the General discussion category (which is included in every course by
+  default), add an [INTRO] post to initiate a thread for student and staff
+  introductions.
+
+* For each discussion category you create, add the first post to it to describe
+  the way you intend it to be used. In addition to providing guidance, these
+  initial messages can also act as models for students to follow when they
+  create their own posts.
+
+* If you include discussion components along with problem components in a unit,
+  you can add a post that encourages students to use the discussion topic to
+  ask for help with the problems, but reminds them not to post the answers.
 
 ======================================
 Minimize Thread Proliferation
