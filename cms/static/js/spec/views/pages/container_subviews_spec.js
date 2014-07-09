@@ -12,7 +12,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             beforeEach(function () {
                 edit_helpers.installTemplate('xblock-string-field-editor');
                 edit_helpers.installTemplate('publish-xblock');
-                edit_helpers.installTemplate('publish-info');
+                edit_helpers.installTemplate('publish-history');
                 appendSetFixtures(mockContainerPage);
 
                 model = new XBlockInfo({
@@ -302,7 +302,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
             });
 
-            describe("PublishInfo", function () {
+            describe("PublishHistory", function () {
                 var lastPublishCss = ".wrapper-last-publish";
 
                 it('renders the last published date and user when the block is published', function () {
@@ -316,7 +316,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('renders never published when the block is unpublished', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     fetch({ "id": "locator-container", "published": false,
-                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako" })});
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako" });
                     expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
                 });
 
