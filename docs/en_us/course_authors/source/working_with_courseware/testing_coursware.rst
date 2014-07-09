@@ -1,7 +1,7 @@
-.. _Testing Your Course:
+.. _Testing Your Courseware:
 
 ###########################
-Testing Your Course
+Testing Your Courseware
 ###########################
 
 The way your course looks in Studio is not the way students see and experience it. To test your course, while you develop course content and afterward, you must view and interact with your course from a student's point of view.
