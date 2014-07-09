@@ -36,6 +36,13 @@
       }
     }
 
+    .group-configuration-separator {
+      border: 0;
+      height: 0;
+      border-top: 2px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
     .group-configuration {
       @extend %ui-window;
       position: relative;
