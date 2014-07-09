@@ -46,7 +46,7 @@ function(BaseView, _, str, $, gettext) {
             return this;
         },
 
-        removeGroup: function(e) {
+        removeGroup: function(event) {
             if(event && event.preventDefault) { event.preventDefault(); }
             this.model.collection.remove(this.model);
             return this.remove();
