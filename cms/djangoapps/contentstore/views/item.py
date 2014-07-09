@@ -537,6 +537,15 @@ def create_xblock_info(usage_key, xblock, data=None, metadata=None):
     """
     publish_state = compute_publish_state(xblock) if xblock else None
 
+    # Guard against bad user_id, like the infamous "**replace_user**"
+    def safe_get_username(user_id):
+        if user_id:
+            try:
+                return User.objects.get(id=user_id).username
+            except ValueError:
+                return None
+        return None
+
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -544,11 +553,11 @@ def create_xblock_info(usage_key, xblock, data=None, metadata=None):
         "has_changes": modulestore().has_changes(usage_key),
         "published": publish_state in (PublishState.public, PublishState.draft),
         "edited_on": get_default_time_display(xblock.edited_on) if xblock.edited_on else None,
-        "edited_by": User.objects.get(id=xblock.edited_by).username if xblock.edited_by else None,
+        "edited_by": safe_get_username(xblock.edited_by),
         "subtree_edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "subtree_edited_by": User.objects.get(id=xblock.subtree_edited_by).username if xblock.subtree_edited_by else None,
+        "subtree_edited_by": safe_get_username(xblock.subtree_edited_by),
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        "published_by": User.objects.get(id=xblock.published_by).username if xblock.published_by else None,
+        "published_by": safe_get_username(xblock.published_by),
     }
     if data is not None:
         xblock_info["data"] = data
