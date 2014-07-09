@@ -593,7 +593,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if include_child_info and is_container:
         xblock_info['child_info'] = _create_xblock_child_info(xblock, recurse_child_info=recurse_child_info)
-    if xblock.graded:
+    if xblock.graded and xblock.category == u'sequential' and not is_unit(xblock):
         xblock_info['due_date'] = get_default_time_display(xblock.due)
         xblock_info['grading_format'] = xblock.format
     return xblock_info

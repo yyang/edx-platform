@@ -61,7 +61,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     addChildLabel: addChildName,
                     defaultNewChildName: defaultNewChildName,
                     isCollapsed: isCollapsed,
-                    includesChildren: this.shouldRenderChildren()
+                    includesChildren: this.shouldRenderChildren(),
+                    isEditable: this.isEditable(),
                 });
                 if (this.parentInfo) {
                     this.setElement($(html));
@@ -178,6 +179,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                         parentView.onChildDeleted();
                     }
                 });
+            },
+
+            isEditable: function() {
+                return _.contains(['sequential', 'chapter'], this.model.get('category'));
+            },
+
+            editXBlock: function() {
+                alert('Edited');
+                // var parentView = this.parentView;
+                // XBlockViewUtils.deleteXBlock(this.model).done(function() {
+                //     if (parentView) {
+                //         parentView.onChildDeleted();
+                //     }
+                // });
             },
 
             /**
