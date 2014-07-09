@@ -286,6 +286,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('renders the last published date and user when there are no changes', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     fetch({ "id": "locator-container", "has_changes": false,
+                        "subtree_edited_on": "Jun 30, 2014 at 14:20 UTC", "subtree_edited_by": "joe",
                         "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
                     expect(containerPage.$(lastDraftCss).text()).
                         toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
@@ -294,9 +295,10 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('renders the last saved date and user when there are changes', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
                     fetch({ "id": "locator-container", "has_changes": true,
-                        "edited_on": "Jul 01, 2014 at 12:45 UTC", "edited_by": "amako" });
+                        "subtree_edited_on": "Jul 02, 2014 at 14:20 UTC", "subtree_edited_by": "joe",
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
                     expect(containerPage.$(lastDraftCss).text()).
-                        toContain("Draft saved on Jul 01, 2014 at 12:45 UTC by amako");
+                        toContain("Draft saved on Jul 02, 2014 at 14:20 UTC by joe");
                 });
             });
 
@@ -313,7 +315,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('renders never published when the block is unpublished', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
-                    fetch({ "id": "locator-container", "published": false });
+                    fetch({ "id": "locator-container", "published": false,
+                        "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako" })});
                     expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
                 });
 
