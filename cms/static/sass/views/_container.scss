@@ -177,6 +177,26 @@
 
     }
 
+    // versioning widget
+    .unit-publish-history {
+
+      .wrapper-last-publish {
+        margin-bottom: $baseline;
+        padding: ($baseline*.75);
+        background-color: $white;
+
+        .copy {
+          @extend %t-copy-sub2;
+          color: $gray;
+        }
+
+        .date,
+        .user {
+          font-weight: 600;
+        }
+      }
+    }
+
     // location widget
     .unit-location {
       @extend %bar-module;
