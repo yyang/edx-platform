@@ -30,6 +30,7 @@ import imp
 import json
 
 from path import path
+from warnings import simplefilter
 
 from .discussionsettings import *
 from .modulestore_settings import *
@@ -752,8 +753,14 @@ MOCK_PEER_GRADING = False
 # Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
 
-################################# Jasmine ###################################
+################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+
+################################# Deprecation warnings #####################
+
+# Filter deprecation warnings to only show the first instance
+# Useful to capture (so we can search Splunk) but don't want the logs littered.
+simplefilter('default')
 
 ################################# Waffle ###################################
 

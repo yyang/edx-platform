@@ -15,7 +15,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-from warnings import filterwarnings
+from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
 # import settings from LMS for consistent behavior with CMS
@@ -149,6 +149,9 @@ INSTALLED_APPS += ('external_auth', )
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
+# Filter deprecation warnings to only show the first instance of the warning
+# https://docs.python.org/2/library/warnings.html#the-warnings-filter
+simplefilter('default')  # Change to 'ignore' to ignore all warnings
 
 ################################# CELERY ######################################
 

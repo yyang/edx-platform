@@ -15,7 +15,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-from warnings import filterwarnings
+from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
@@ -179,6 +179,10 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
+
+# Filter deprecation warnings
+# https://docs.python.org/2/library/warnings.html#the-warnings-filter
+simplefilter('default')  # change to 'ignore' to ignore all warnings
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
