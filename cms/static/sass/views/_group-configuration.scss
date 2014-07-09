@@ -70,11 +70,11 @@
         }
 
         .group-configuration-info {
+          @extend %t-copy-sub1;
           color: $gray-l1;
           margin-left: $baseline;
 
           &.group-configuration-info-inline {
-            @extend %t-copy-sub1;
             display: table;
             width: 70%;
             margin: ($baseline/4) 0 ($baseline/2) $baseline;
