@@ -110,9 +110,10 @@ class GroupConfigurationsCreateTestCase(CourseTestCase):
             u'id': u'test_id',
             u'description': u'Test description',
             u'name': u'Test name',
+            u'version': 1,
             u'groups': [
-                {u'id': 0, u'name': u'Group A'},
-                {u'id': 1, u'name': u'Group B'}
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1}
             ]
         }
         response = self.client.post(

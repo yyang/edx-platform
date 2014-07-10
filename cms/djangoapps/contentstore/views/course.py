@@ -877,6 +877,15 @@ class GroupConfiguration(object):
         self.course = course
         self.assign_id(configuration_id)
         self.assign_group_ids()
+        self.extend()
+        self.validate()
+
+    def to_json(self):
+        return self.configuration
+
+    @property
+    def id(self):
+        return self.configuration.get('id')
 
     @staticmethod
     def parse(json_string):
@@ -939,10 +948,8 @@ class GroupConfiguration(object):
 
     def get_user_partition(self):
         """
-        Instantiate user partition for saving in course.
+        Get user partition for saving in course.
         """
-        self.extend()
-        self.validate()
         return UserPartition.from_json(self.configuration)
 
 
@@ -978,17 +985,17 @@ def group_configurations_list_handler(request, course_key_string):
         elif request.method == 'POST':
         # create a new group configuration for the course
             try:
-                user_partition = GroupConfiguration(request.body, course).get_user_partition()
+                new_configuration = GroupConfiguration(request.body, course)
             except GroupConfigurationsValidationError as err:
                 return JsonResponse({"error": err.message}, status=400)
 
-            course.user_partitions.append(user_partition)
-            response = JsonResponse(user_partition, status=201)
+            course.user_partitions.append(new_configuration.get_user_partition())
+            response = JsonResponse(new_configuration.to_json(), status=201)
 
             response["Location"] = reverse_course_url(
                 'group_configurations_detail_handler',
                 course.id,
-                kwargs={'group_configuration_id': user_partition.id}
+                kwargs={'group_configuration_id': new_configuration.id}
             )
             store.update_item(course, request.user.id)
             return response
@@ -1024,17 +1031,17 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     elif request.method in ('POST', 'PUT'):  # can be either and sometimes
                                         # django is rewriting one to the other
         try:
-            user_partition = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
+            new_configuration = GroupConfiguration(request.body, course, group_configuration_id)
         except GroupConfigurationsValidationError as err:
             return JsonResponse({"error": err.message}, status=400)
 
         if configuration:
             index = course.user_partitions.index(configuration)
-            course.user_partitions[index] = user_partition
+            course.user_partitions[index] = new_configuration.get_user_partition()
         else:
-            course.user_partitions.append(user_partition)
+            course.user_partitions.append(new_configuration.get_user_partition())
         store.update_item(course, request.user.id)
-        return JsonResponse(user_partition, status=201)
+        return JsonResponse(new_configuration.to_json(), status=201)
 
 
 def _get_course_creator_status(user):
