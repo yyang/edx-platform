@@ -135,8 +135,7 @@ def get_current_child(xmodule, min_depth=None):
             default_child = child_modules[0]
         else:
             content_children = [child for child in child_modules if
-                                child.has_children_at_depth(min_depth - 1) and
-                                child.get_display_items()]
+                                child.has_children_at_depth(min_depth - 1) and child.get_display_items()]
             default_child = content_children[0] if content_children else None
 
         return default_child
