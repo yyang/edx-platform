@@ -40,18 +40,18 @@
         <% }) %>
       </ol>
       <hr class="group-configuration-separator">
-      <ol class="group-configuration-info">
+      <ol class="group-configuration-usage">
         <% if (!_.isEmpty(usage)) { %>
-          <li class="group-configuration-description">
+          <li class="group-configuration-usage-text">
             Group configuration is used in:
           </li>
           <% _.each(usage, function(unit) { %>
-            <li class="unit">
+            <li class="group-configuration-usage-unit">
               <a href=<%= unit.url %> ><%= unit.label %></a>
             </li>
           <% }) %>
         <% } else { %>
-          <li class="group-configuration-description">
+          <li class="group-configuration-usage-text">
             <%= gettext('This Group Configuration is not in use. Start by adding a content experiment to any Unit via the') %>
             <a href="https://www.edx.org"><%= gettext('Course Outline') %></a>.
           </li>

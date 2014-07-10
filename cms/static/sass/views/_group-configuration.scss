@@ -76,6 +76,18 @@
           }
         }
 
+        .group-configuration-usage {
+          color: $gray-l1;
+          margin-left: $baseline;
+
+          li {
+            padding: ($baseline/4) 0;
+          }
+          // Classes used in Underscore template and not defined yet:
+          // group-configuration-usage-text
+          // group-configuration-usage-unit
+        }
+
         .group-configuration-info {
           color: $gray-l1;
           margin-left: $baseline;
@@ -89,6 +101,10 @@
               @include box-sizing(border-box);
               display: table-cell;
               margin-right: 1%;
+
+              &.group-configuration-usage-count {
+                font-style: oblique;
+              }
             }
           }
 
