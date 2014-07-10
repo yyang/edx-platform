@@ -26,6 +26,8 @@
           % else:
             % if self.stanford_theme_enabled():
               <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+            % elif self.stu_theme_enabled():
+              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Shantou University")}</h1>
             % else:
               <h1>${_("The Future of Online Education")}</h1>
             % endif

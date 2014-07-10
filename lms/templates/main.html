@@ -30,6 +30,16 @@
   %>
 </%def>
 
+## Define the theme enabler for STU / MYSTU projects;
+<%def name="stu_theme_enabled()">
+  <%
+    if not theme_enabled():
+      return False
+
+    return getattr(settings, "THEME_NAME", None) == "stu"
+  %>
+</%def>
+
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
   <%block name="title">
