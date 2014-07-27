@@ -91,10 +91,12 @@ LANGUAGE_CODE = 'en'
 
 MAKO_TEMPLATES['main'].append(ENV_ROOT / 'themes' / 'default' / 'templates')
 
-print 'templates: ', MAKO_TEMPLATES['main']
-
 ############################### Pipeline #######################################
 # !TODO: Read through original common.py and minimize number of requests;
+
+PIPELINE_CSS['style-app']['source_filenames'] = []
+PIPELINE_CSS['style-app-extend1']['source_filenames'] = []
+PIPELINE_CSS['style-app-extend2']['source_filenames'] = []
 
 ############################## Video ###########################################
 # !TODO: Gather update from Chengdu team and put information in it;
@@ -148,12 +150,12 @@ MICROSITE_CONFIGURATION = {
         "SITE_NAME": "test_microsite.localhost",
         "course_org_filter": "TestMicrositeX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "default/css/test_microsite.css",
+        "css_overrides_file": "default/css/stu.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
         "course_index_overlay_logo_file": "default/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+        # "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
     }
 }
 MICROSITE_ROOT_DIR = ENV_ROOT + "/themes"
