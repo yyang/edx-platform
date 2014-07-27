@@ -16,6 +16,7 @@ ENABLE_JASMINE = False
 ####################### ORIGINAL FEATURES OVERRIDE #############################
 
 FEATURES['USE_MICROSITES'] = True
+FEATURES['ENABLE_MKTG_SITE'] = True
 
 # When True, all courses will be active, regardless of start date
 FEATURES['DISABLE_START_DATES'] = True
@@ -34,8 +35,8 @@ FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = True
 FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = False
 
 # Toggle to indicate use of a custom theme
-FEATURES['USE_CUSTOM_THEME'] = True
-THEME_NAME = 'stu'
+# FEATURES['USE_CUSTOM_THEME'] = True
+# THEME_NAME = 'stu'
 
 # Don't autoplay videos for students
 FEATURES['AUTOPLAY_VIDEOS'] = True
@@ -86,6 +87,12 @@ TIME_ZONE = 'Asia/Shanghai'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en'
 
+############################# EDX WEB Override #################################
+
+MAKO_TEMPLATES['main'].append(ENV_ROOT / 'themes' / 'default' / 'templates')
+
+print 'templates: ', MAKO_TEMPLATES['main']
+
 ############################### Pipeline #######################################
 # !TODO: Read through original common.py and minimize number of requests;
 
@@ -132,21 +139,21 @@ CERT_NAME_LONG = "Certificate of STU Course Achievement"
 MICROSITE_CONFIGURATION = {
     "default": {
         "university": "Shantou University",
-        "domain_prefix": "www",
+        "domain_prefix": "edxtest",
         "platform_name": "Test Microsite",
-        "logo_image_url": "test_microsite/images/header-logo.png",
+        "logo_image_url": "default/images/header-logo.png",
         "email_from_address": "test_microsite@edx.org",
         "payment_support_email": "test_microsite@edx.org",
         "ENABLE_MKTG_SITE": False,
         "SITE_NAME": "test_microsite.localhost",
         "course_org_filter": "TestMicrositeX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "default/css/test_microsite.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "course_index_overlay_logo_file": "default/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
     }
 }
-MICROSITE_ROOT_DIR = COMMON_ROOT + "/stu-site"
+MICROSITE_ROOT_DIR = ENV_ROOT + "/themes"
