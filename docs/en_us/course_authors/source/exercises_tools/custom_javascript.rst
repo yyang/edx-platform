@@ -57,9 +57,9 @@ To re-create the example problem above, you'll need the following files.
    - webGLDemo.css
    - three.min.js
 
-To download these files in a .zip archive, go to http://files.edx.org/JSInput.zip.
+To download these files in a .zip archive, go to /static/files/JSInput.zip.
 
-.. note:: If you need to bypass the SOP, you'll also need the **jschannel.js** file, and your webGLDemo.html file will be slightly different. To download all these files in a .zip archive, go to http://files.edx.org/JSInput_BypassSOP.zip.
+.. note:: If you need to bypass the SOP, you'll also need the **jschannel.js** file, and your webGLDemo.html file will be slightly different. To download all these files in a .zip archive, go to /static/files/JSInput_BypassSOP.zip.
 
 #. Download and unpackage the files in either the JSInput.zip file or the JSInput_BypassSOP.zip file.
 #. On the **Files & Uploads** page, upload all the files from the .zip file.

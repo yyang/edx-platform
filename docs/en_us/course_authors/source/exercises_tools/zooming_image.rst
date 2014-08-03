@@ -17,7 +17,7 @@ To create a zooming image tool, you need the following files.
 
 * The image that you want students to see when they access the unit.
 * The image that appears in the magnified area when a student clicks the regular image. This image may be larger than the regular image.
-* The **jquery.loupeAndLightbox.js** JavaScript file. Every zooming image tool uses this JavaScript file, and you won't make any changes to it. `To download this file, right-click here <http://files.edx.org/jquery.loupeAndLightbox.js>`_, and then click **Save Link As** to save the file on your computer.
+* The **jquery.loupeAndLightbox.js** JavaScript file. Every zooming image tool uses this JavaScript file, and you won't make any changes to it. `To download this file, right-click here </static/files/jquery.loupeAndLightbox.js>`_, and then click **Save Link As** to save the file on your computer.
 
 ****************************
 Create a Zooming Image Tool

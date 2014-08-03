@@ -3735,7 +3735,7 @@ module.exports = Provider.extend({
     }
     if (options.enhancedLinkAttribution) {
       var protocol = 'https:' === document.location.protocol ? 'https:' : 'http:';
-      var pluginUrl = protocol + '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+      // var pluginUrl = protocol + '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
       window._gaq.push(['_require', 'inpage_linkid', pluginUrl]);
     }
     if (type(options.siteSpeedSampleRate) === 'number') {
@@ -3755,14 +3755,14 @@ module.exports = Provider.extend({
 
     // URLs change if DoubleClick is on. Even though Google Analytics makes a
     // queue, the `_gat` object isn't available until the library loads.
-    if (options.doubleClick) {
-      load('//stats.g.doubleclick.net/dc.js', ready);
-    } else {
-      load({
-        http  : 'http://www.google-analytics.com/ga.js',
-        https : 'https://ssl.google-analytics.com/ga.js'
-      }, ready);
-    }
+    // if (options.doubleClick) {
+    //   load('//stats.g.doubleclick.net/dc.js', ready);
+    // } else {
+    //   load({
+    //     http  : 'http://www.google-analytics.com/ga.js',
+    //     https : 'https://ssl.google-analytics.com/ga.js'
+    //   }, ready);
+    // }
   },
 
   initializeUniversal: function (options, ready) {
@@ -3800,7 +3800,7 @@ module.exports = Provider.extend({
       this.pageview(path);
     }
 
-    load('//www.google-analytics.com/analytics.js');
+    // load('//www.google-analytics.com/analytics.js');
 
     // Google makes a queue so it's ready immediately.
     ready();
@@ -4897,7 +4897,7 @@ module.exports = Provider.extend({
   // Qualaroo's script has two options in its URL.
   initialize : function (options, ready) {
     window._kiq = window._kiq || [];
-    load('//s3.amazonaws.com/ki.js/' + options.customerId + '/' + options.siteToken + '.js');
+    // load('//s3.amazonaws.com/ki.js/' + options.customerId + '/' + options.siteToken + '.js');
 
     // Qualaroo creates a queue, so it's ready immediately.
     ready();

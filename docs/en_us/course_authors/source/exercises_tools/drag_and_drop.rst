@@ -53,7 +53,7 @@ To create the drag and drop problem that appears in the image above, you'll down
   * Allopurinol.gif
   * AllopurinolAnswer.gif
 
-  To download both these files in a .zip archive, click http://files.edx.org/DragAndDropProblemFiles.zip.
+  To download both these files in a .zip archive, click /static/files/DragAndDropProblemFiles.zip.
 
 2. Upload the Allopurinol.gif and AllopurinolAnswer.gif files to the **Files & Uploads** page.
 #. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.

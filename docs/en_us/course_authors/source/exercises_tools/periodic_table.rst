@@ -22,7 +22,7 @@ To create a periodic table, you need the following files:
 * Periodic-Table-Colors.css
 * PeriodicTableHTML.txt
 
-To download all of these files in a .zip archive, click http://files.edx.org/PeriodicTableFiles.zip. 
+To download all of these files in a .zip archive, click /static/files/PeriodicTableFiles.zip. 
 
 To create the periodic table, you need an HTML component.
 

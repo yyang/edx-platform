@@ -13,7 +13,7 @@ selected:
 .. image:: ../images/JavaScriptInputExample.png
   :alt: Image of the sample JavaScript application, with the cone selected 
 
-You can `download files for that application <http://files.edx.org/JSInput.zip>`_. 
+You can `download files for that application </static/files/JSInput.zip>`_. 
 You must upload these files in Studio to use them in a problem.
 
 The following information steps through this example to demonstrate how to apply

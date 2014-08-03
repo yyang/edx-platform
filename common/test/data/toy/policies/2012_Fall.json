@@ -160,7 +160,7 @@
                 {
                     "action_external": true,
                     "short_description": "Download the Studio Documentation",
-                    "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
+                    "action_url": "/static/files/Getting_Started_with_Studio.pdf",
                     "action_text": "Download Documentation",
                     "is_checked": false,
                     "long_description": "Download the searchable Studio reference documentation in PDF form."

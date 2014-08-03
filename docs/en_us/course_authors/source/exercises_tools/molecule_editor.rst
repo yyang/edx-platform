@@ -23,7 +23,7 @@ To create a molecule editor, you need the following files:
 * MoleculeEditor_HTML.png
 * dopamine.mol
 
-To download all of these files in a .zip archive, go to http://files.edx.org/MoleculeEditorFiles.zip.
+To download all of these files in a .zip archive, go to /static/files/MoleculeEditorFiles.zip.
 
 .. note:: The molecule that appears when the tool starts is a dopamine molecule. To use a different molecule, download the .mol file for that molecule from the `list of molecules <http://www.biotopics.co.uk/jsmol/molecules/>`_ on the `BioTopics <http://www.biotopics.co.uk/>`_ website. Then, upload the .mol file to the **Files & Uploads** page for your course in Studio, and change "dopamine.mol" in the example code to the name of your .mol file.
 

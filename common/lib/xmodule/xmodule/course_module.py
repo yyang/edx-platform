@@ -404,7 +404,7 @@ class CourseFields(object):
                                      {"short_description": _("Download the Studio Documentation"),
                                       "long_description": _("Download the searchable Studio reference documentation in PDF form."),
                                       "is_checked": False,
-                                      "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
+                                      "action_url": "/static/files/Getting_Started_with_Studio.pdf",
                                       "action_text": _("Download Documentation"),
                                       "action_external": True}]},
                           {"short_description": _("Draft Your Course About Page"),
