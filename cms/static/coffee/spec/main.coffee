@@ -43,7 +43,7 @@ requirejs.config({
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
 
-        "mathjax": "/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js",
+        "mathjax": "/static/js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=default",
         "youtube": "/static/js/src/youtube_fallback.js",
         "tender": "/static/js/src/tender_fallback.js",
 
